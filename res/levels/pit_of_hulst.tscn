@@ -4,6 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://dir4p3muy3vrt" path="res://res/actors/player/player.tscn" id="2_player"]
 [ext_resource type="Texture2D" uid="uid://dbde4o56l2p4h" path="res://res/assets/shaders/moon_surface_regolith_01.png" id="3_regolith"]
 [ext_resource type="PackedScene" path="res://res/actors/enemies/worm/worm.tscn" id="4_worm"]
+[ext_resource type="PackedScene" path="res://res/actors/bosses/hermen/hermen_head_cutout.tscn" id="5_hermen"]
 
 [sub_resource type="Environment" id="Environment_main"]
 background_mode = 2
@@ -917,15 +918,8 @@ use_collision = true
 size = Vector3(8, 0.6, 8)
 material = SubResource("Mat_accent")
 
-[node name="HermenPlaceholder" type="StaticBody3D" parent="BossRoom" unique_id=390130768]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 60, -41.7, 0)
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="BossRoom/HermenPlaceholder" unique_id=1140710885]
-shape = SubResource("Shape_boss_marker")
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="BossRoom/HermenPlaceholder" unique_id=2098779386]
-material_override = SubResource("Mat_boss_marker")
-mesh = SubResource("Mesh_boss_marker")
+[node name="Hermen" parent="BossRoom" instance=ExtResource("5_hermen")]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 60, -43.15, 0)
 
 [node name="BossLight" type="OmniLight3D" parent="BossRoom" unique_id=1646156744]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 56, -36, 0)
@@ -946,7 +940,7 @@ modulate = Color(1, 0.85, 0.45, 1)
 text = "◆ BOSS DOOR ◆
 HERMEN HULST
 Instrument of the Portfolio
-(placeholder mesh · 1–2 mechanics TBD)"
+(Twitter DP shrink-wrapped · do not look away)"
 font_size = 28
 outline_size = 6
 
@@ -955,7 +949,8 @@ transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 66, -38, 0)
 modulate = Color(1, 0.55, 0.4, 1)
 text = "HERMEN HULST
 Instrument of the Portfolio
-Synergy is eternal."
+You entered via the rear.
+Of course the head is here."
 font_size = 36
 outline_size = 8
 
@@ -963,9 +958,10 @@ outline_size = 8
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 56, -39, -11)
 modulate = Color(0.9, 0.9, 0.95, 1)
 text = "OKRs this encounter:
-1. Survive
-2. Ship vibes
-3. Do not acquire the studio"
+1. Break his face (phase 1)
+2. Kill shareholders (shield)
+3. Repeat until portfolio dies
+4. Anatomical implications: intentional"
 font_size = 24
 outline_size = 5
 

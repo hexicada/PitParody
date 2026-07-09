@@ -35,6 +35,6 @@ Or use `open_project.bat` if present.
 
 1. **Entry yard** — expanded moon surface, central pit, comedy signage, mantle blocks  
 2. **Worm cave** — short tunnel stub from shaft landing (no jump puzzle, zero enemies)  
-3. **Boss room** — Hermen Hulst placeholder dais/mesh  
+3. **Boss room** — Hermen Hulst as a Vault-of-Cars-style **literal photo cutout** on cardboard (you entered via the rear; of course the head is here)
 
-Path: spawn → fall the shaft → worm cave (shootable roadmap fauna) → boss door. Boss mechanics TBD.
+Path: spawn → fall the shaft → worm cave → shoot the head. Full boss mechanics still light (HP + taunts).

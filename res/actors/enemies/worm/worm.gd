@@ -3,6 +3,8 @@ class_name CaveWorm
 
 ## Simple cave worm: patrols, lunges if the player is near, damages on touch, dies to hitscan.
 
+const _DamageNumber := preload("res://res/actors/fx/damage_number.gd")
+
 @export var display_name: String = "Roadmap Worm"
 @export var max_health: float = 50.0
 @export var move_speed: float = 2.8
@@ -118,6 +120,13 @@ func take_damage(amount: float, _from: Node = null) -> void:
 	health -= amount
 	_flash_left = 0.12
 	_apply_flash()
+	_DamageNumber.spawn(
+		self,
+		global_position + Vector3(0, 1.2, 0),
+		"-%d" % int(round(amount)),
+		Color(1.0, 0.75, 0.2),
+		40
+	)
 	if health <= 0.0:
 		_die()
 
