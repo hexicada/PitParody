@@ -20,7 +20,7 @@ Workspace for this project: `C:\Users\hexicada\Projects\PitOfHulst`
 - Godot **4.6** FPS prototype forked from Fate (sibling folder, full git history).
 - **Title:** **Pit of Hulst: Heresy of the Live Service**
 - Destiny **Pit of Heresy** parody (Vault of Cars energy, more structured).
-- Final boss: **Herman Hulst** (e.g. *Instrument of the Portfolio*).
+- Final boss: **Hermen Hulst** (e.g. *Instrument of the Portfolio*).
 - Tone: affectionate roast + corporate cosmic horror (live service as dark religion).
 - Fan parody — not affiliated with Bungie / Destiny / PlayStation.
 
@@ -57,7 +57,7 @@ Workspace for this project: `C:\Users\hexicada\Projects\PitOfHulst`
         ↓
 [2] WORM CAVE   — short cave, worms; NO long jump puzzle
         ↓
-[3] BOSS ROOM   — Herman Hulst
+[3] BOSS ROOM   — Hermen Hulst
 ```
 
 **In:** entry yard, central pit/shaft, worm cave (simple enemies/hazards), boss arena, comedy via text/signage.
@@ -86,7 +86,7 @@ Blockout only:
 - Main scene: `res/levels/pit_of_hulst.tscn` (wired in `project.godot`)
 - Legacy sandbox kept: `res/levels/test_arena.tscn`
 - Path: entry yard → central shaft fall → worm cave walk → boss room (no enemies)
-- Comedy via `Label3D` signage; Herman = red box on gold dais
+- Comedy via `Label3D` signage; Hermen = red box on gold dais
 
 ## Next chat should
 

@@ -39,6 +39,20 @@ var slide_cooldown: float
 @onready var interaction_label: Label = $UI/InteractionLabel
 @onready var combat_bridge: PlayerCombatBridge = $CombatBridge
 @onready var weapon_anchor: WeaponAnchor = $HeadPivot/Camera3D/ViewModelRoot/UpperFP/WeaponAnchor
+@onready var camera_3d: Camera3D = $HeadPivot/Camera3D
+@onready var health_label: Label = $UI/HealthLabel
+@onready var death_overlay: Control = $UI/DeathOverlay
+@onready var death_title: Label = $UI/DeathOverlay/Center/VBox/DeathTitle
+@onready var death_killer: Label = $UI/DeathOverlay/Center/VBox/DeathKiller
+@onready var death_flavor: Label = $UI/DeathOverlay/Center/VBox/DeathFlavor
+@onready var hit_marker: Control = $UI/HitMarker
+@onready var weapon_hud: Label = $UI/WeaponHud
+
+@export var max_health: float = 100.0
+@export var fire_damage: float = 25.0
+@export var fire_range: float = 55.0
+@export var fire_cooldown: float = 0.14
+@export var death_hold_time: float = 3.6
 
 var _gravity := 9.8
 var _state := PlayerLocomotionState.Value.STANDING
@@ -52,9 +66,18 @@ var _mantle_time_left := 0.0
 var _mantle_start_position := Vector3.ZERO
 var _mantle_target_position := Vector3.ZERO
 var _air_jumps_left := 0
+var health: float = 100.0
+var _spawn_position: Vector3
+var _spawn_yaw: float = 0.0
+var _fire_cd: float = 0.0
+var _is_dead: bool = false
+var _death_timer: float = 0.0
+var _hit_marker_timer: float = 0.0
+var _camera_punch: float = 0.0
 
 
 func _ready() -> void:
+	add_to_group("player")
 	_ensure_default_input_actions()
 	_gravity = float(ProjectSettings.get_setting("physics/3d/default_gravity", 9.8))
 	_apply_movement_profile()
@@ -64,8 +87,15 @@ func _ready() -> void:
 	mantle_probe_lower.enabled = true
 	mantle_probe_upper.enabled = true
 	_air_jumps_left = max_air_jumps
+	health = max_health
+	_spawn_position = global_position
+	_spawn_yaw = rotation.y
+	if death_overlay:
+		death_overlay.visible = false
+	if hit_marker:
+		hit_marker.modulate.a = 0.0
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
-	hint_label.text = "WASD/Left stick move | Mouse/Right stick look | Shift/L3 sprint | Space/A jump | Ctrl/B crouch/slide | Esc mouse"
+	hint_label.text = "WASD move | Mouse look | Shift sprint | Space jump | Ctrl crouch/slide | LMB Feedback Loop | Esc mouse"
 	combat_bridge.update_from_locomotion_state(_state)
 	_update_debug_label()
 
@@ -100,23 +130,177 @@ func _apply_movement_profile() -> void:
 	slide_cooldown = movement_profile.slide_cooldown
 
 
-func _unhandled_input(event: InputEvent) -> void:
+func _input(event: InputEvent) -> void:
+	# Use _input (not _unhandled_input) so HUD Controls can't swallow look/fire.
+	if _is_dead:
+		return
+
 	if event.is_action_pressed("ui_cancel"):
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+		get_viewport().set_input_as_handled()
 		return
 
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 		if Input.mouse_mode != Input.MOUSE_MODE_CAPTURED:
 			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+			get_viewport().set_input_as_handled()
 			return
+		_try_fire()
+		get_viewport().set_input_as_handled()
+		return
 
 	if Input.mouse_mode != Input.MOUSE_MODE_CAPTURED:
 		return
 
-	camera_controller.handle_input(event, self)
+	if event is InputEventMouseMotion:
+		camera_controller.handle_input(event, self)
+		get_viewport().set_input_as_handled()
+
+
+func take_damage(amount: float, from: Node = null) -> void:
+	if _is_dead or health <= 0.0:
+		return
+	health = maxf(health - amount, 0.0)
+	_camera_punch = minf(_camera_punch + 0.08, 0.25)
+	_update_debug_label()
+	if health <= 0.0:
+		_begin_death(from)
+
+
+func _try_fire() -> void:
+	if _is_dead or _fire_cd > 0.0:
+		return
+	if combat_bridge and combat_bridge.readiness == PlayerCombatBridge.WeaponReadiness.SLIDE:
+		return
+	_fire_cd = fire_cooldown
+	_camera_punch = minf(_camera_punch + 0.035, 0.12)
+
+	var gun := weapon_anchor.get_active_view_model() if weapon_anchor else null
+	if gun and gun.has_method("on_fire"):
+		gun.on_fire()
+	elif weapon_anchor:
+		for child in weapon_anchor.get_children():
+			if child.has_method("on_fire"):
+				child.on_fire()
+				break
+
+	if camera_3d == null:
+		return
+	var from := camera_3d.global_position
+	var aim := -camera_3d.global_transform.basis.z
+	var to := from + aim * fire_range
+	var query := PhysicsRayQueryParameters3D.create(from, to)
+	query.collide_with_areas = false
+	query.collide_with_bodies = true
+	query.exclude = [get_rid()]
+	query.collision_mask = 0xFFFFFFFF
+	var hit := get_world_3d().direct_space_state.intersect_ray(query)
+	if hit.is_empty():
+		_set_weapon_hud("The Feedback Loop  ·  missed (no alignment)")
+		return
+	var node: Node = hit.get("collider") as Node
+	while node:
+		if node != self and node.has_method("take_damage"):
+			node.call("take_damage", fire_damage, self)
+			_show_hit_marker()
+			var victim_name := _killer_name(node)
+			_set_weapon_hud("The Feedback Loop  ·  hit %s" % victim_name)
+			return
+		node = node.get_parent()
+	_set_weapon_hud("The Feedback Loop  ·  terrain (out of scope)")
+
+
+func _begin_death(from: Node = null) -> void:
+	_is_dead = true
+	_death_timer = death_hold_time
+	velocity = Vector3.ZERO
+	if death_overlay:
+		death_overlay.visible = true
+	if death_title:
+		death_title.text = "You are dead."
+	if death_killer:
+		death_killer.text = "Killed by\n%s" % _killer_name(from)
+	if death_flavor:
+		death_flavor.text = _random_death_flavor()
+	_update_debug_label()
+
+
+func _finish_respawn() -> void:
+	_is_dead = false
+	_death_timer = 0.0
+	if death_overlay:
+		death_overlay.visible = false
+	global_position = _spawn_position
+	rotation.y = _spawn_yaw
+	velocity = Vector3.ZERO
+	health = max_health
+	_state = PlayerLocomotionState.Value.STANDING
+	_is_crouching = false
+	_crouch_alpha = 0.0
+	_apply_crouch_pose(0.0)
+	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+	_set_weapon_hud("The Feedback Loop  ·  re-engaged")
+	_update_debug_label()
+
+
+func _killer_name(from: Node) -> String:
+	if from == null:
+		return "Unknown Hazard"
+	if "display_name" in from:
+		var n: Variant = from.get("display_name")
+		if n != null and str(n) != "":
+			return str(n)
+	if from.name:
+		return str(from.name)
+	return "Unknown Hazard"
+
+
+func _random_death_flavor() -> String:
+	var lines := [
+		"Your Light was reassigned.",
+		"Scope expanded. You did not.",
+		"Returning to the entry yard…",
+		"Ghost says: maybe don't stand in the worm.",
+		"Performance: Needs Improvement.",
+		"This death will be reflected in the retro.",
+	]
+	return lines[randi() % lines.size()]
+
+
+func _show_hit_marker() -> void:
+	_hit_marker_timer = 0.12
+	if hit_marker:
+		hit_marker.modulate.a = 1.0
+
+
+func _set_weapon_hud(text: String) -> void:
+	if weapon_hud:
+		weapon_hud.text = text
 
 
 func _physics_process(delta: float) -> void:
+	if _fire_cd > 0.0:
+		_fire_cd = maxf(_fire_cd - delta, 0.0)
+	if _hit_marker_timer > 0.0:
+		_hit_marker_timer = maxf(_hit_marker_timer - delta, 0.0)
+		if hit_marker:
+			hit_marker.modulate.a = clampf(_hit_marker_timer / 0.12, 0.0, 1.0)
+	if _camera_punch > 0.0:
+		_camera_punch = maxf(_camera_punch - delta * 0.8, 0.0)
+		if camera_3d:
+			camera_3d.rotation_degrees.x = -_camera_punch * 18.0
+	elif camera_3d:
+		camera_3d.rotation_degrees.x = move_toward(camera_3d.rotation_degrees.x, 0.0, 60.0 * delta)
+
+	if _is_dead:
+		_death_timer -= delta
+		if death_flavor and _death_timer < 1.2:
+			death_flavor.text = "Respawning…"
+		if _death_timer <= 0.0:
+			_finish_respawn()
+		_update_debug_label()
+		return
+
 	camera_controller.update_controller_look(self, delta)
 
 	if _state == PlayerLocomotionState.Value.MANTLING:
@@ -505,6 +689,13 @@ func _update_debug_label() -> void:
 		_horizontal_speed(),
 		weapon_ready
 	]
+	if health_label:
+		if _is_dead:
+			health_label.text = "HP: 0 / %.0f" % max_health
+		else:
+			health_label.text = "HP: %.0f / %.0f" % [health, max_health]
+	if weapon_hud and weapon_hud.text == "":
+		weapon_hud.text = "The Feedback Loop  ·  ready"
 	interaction_label.text = interaction_component.get_interaction_hint()
 
 

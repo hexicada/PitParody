@@ -3,6 +3,7 @@
 [ext_resource type="Sky" uid="uid://wm5praaxa7ce" path="res://res/assets/skyboxes/new_sky.tres" id="1_sky"]
 [ext_resource type="PackedScene" uid="uid://dir4p3muy3vrt" path="res://res/actors/player/player.tscn" id="2_player"]
 [ext_resource type="Texture2D" uid="uid://dbde4o56l2p4h" path="res://res/assets/shaders/moon_surface_regolith_01.png" id="3_regolith"]
+[ext_resource type="PackedScene" path="res://res/actors/enemies/worm/worm.tscn" id="4_worm"]
 
 [sub_resource type="Environment" id="Environment_main"]
 background_mode = 2
@@ -184,11 +185,6 @@ roughness = 0.9
 albedo_color = Color(0.2, 0.14, 0.22, 1)
 roughness = 0.95
 
-[sub_resource type="StandardMaterial3D" id="Mat_accent"]
-albedo_color = Color(0.75, 0.55, 0.15, 1)
-metallic = 0.4
-roughness = 0.45
-
 [sub_resource type="StandardMaterial3D" id="Mat_boss"]
 albedo_color = Color(0.35, 0.36, 0.4, 1)
 metallic = 0.15
@@ -198,6 +194,11 @@ roughness = 0.75
 albedo_color = Color(0.42, 0.38, 0.28, 1)
 metallic = 0.25
 roughness = 0.7
+
+[sub_resource type="StandardMaterial3D" id="Mat_accent"]
+albedo_color = Color(0.75, 0.55, 0.15, 1)
+metallic = 0.4
+roughness = 0.45
 
 [sub_resource type="BoxShape3D" id="Shape_boss_marker"]
 size = Vector3(2.5, 3.5, 2.5)
@@ -435,20 +436,22 @@ mesh = SubResource("Mesh_mantle")
 [node name="Signage" type="Node3D" parent="EntryYard" unique_id=948602768]
 
 [node name="WelcomeSign" type="Label3D" parent="EntryYard/Signage" unique_id=146636453]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.2, 34)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 22, 0)
+pixel_size = 0.067
+billboard = 1
 modulate = Color(0.95, 0.9, 0.7, 1)
 text = "PIT OF HULST
 Heresy of the Live Service
 — Fan Parody · Not Affiliated —"
-font_size = 48
-outline_size = 8
+font_size = 64
+outline_size = 10
 
 [node name="PitSign" type="Label3D" parent="EntryYard/Signage" unique_id=2060807396]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8, 18.5)
 modulate = Color(1, 0.75, 0.35, 1)
 text = "▼ MANDATORY ENGAGEMENT FUNNEL ▼
-Enter Herman. Exit dignity.
-(High-effort corporate posterior.)"
+Enter Hermen. Exit dignity.
+(Low effort corporate posterior.)"
 outline_size = 6
 
 [node name="DisclaimerSign" type="Label3D" parent="EntryYard/Signage" unique_id=6679062]
@@ -823,17 +826,35 @@ use_collision = true
 size = Vector3(33, 1, 6)
 material = SubResource("Mat_cave_floor")
 
-[node name="WormHazardStubA" type="CSGBox3D" parent="WormCave" unique_id=736054693]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22, -43.4, -1.8)
-use_collision = true
-size = Vector3(2.2, 1.2, 1.4)
-material = SubResource("Mat_accent")
+[node name="Worms" type="Node3D" parent="WormCave" unique_id=841276745]
 
-[node name="WormHazardStubB" type="CSGBox3D" parent="WormCave" unique_id=888731568]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32, -43.5, 1.6)
-use_collision = true
-size = Vector3(2.8, 1, 1.6)
-material = SubResource("Mat_accent")
+[node name="OKRGrub" parent="WormCave/Worms" unique_id=1479196819 instance=ExtResource("4_worm")]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 20, -44, -1.2)
+display_name = "OKR Grub"
+patrol_half_extent = 2.5
+
+[node name="SynergyLarva" parent="WormCave/Worms" unique_id=2040800801 instance=ExtResource("4_worm")]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 26, -44, 1.1)
+display_name = "Synergy Larva"
+move_speed = 3.2
+patrol_half_extent = 3.0
+
+[node name="BacklogBore" parent="WormCave/Worms" unique_id=1209449068 instance=ExtResource("4_worm")]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 33, -44, -0.6)
+display_name = "Backlog Bore"
+max_health = 55.0
+patrol_half_extent = 2.8
+contact_damage = 15.0
+
+[node name="Stakeholder" parent="WormCave/Worms" unique_id=1159092842 instance=ExtResource("4_worm")]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 39, -44, 0.9)
+display_name = "Stakeholder"
+max_health = 70.0
+move_speed = 2.2
+lunge_speed = 7.5
+patrol_half_extent = 2.0
+aggro_range = 11.0
+contact_damage = 18.0
 
 [node name="CaveLightA" type="OmniLight3D" parent="WormCave" unique_id=1362178596]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, -41, 0)
@@ -851,16 +872,16 @@ omni_range = 12.0
 transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 16.5, -41.2, 0)
 modulate = Color(0.9, 0.7, 1, 1)
 text = "WORM CAVE
-No long jump puzzle
-(we checked with Legal)"
+Roadmap fauna ahead
+LMB = deprioritize"
 font_size = 26
 outline_size = 6
 
 [node name="CaveMidSign" type="Label3D" parent="WormCave" unique_id=1038576165]
 transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 28, -40.8, -2.4)
 modulate = Color(0.85, 0.75, 0.95, 1)
-text = "Future worms go here
-Please do not feed the roadmap"
+text = "Please do not feed the roadmap
+(they feed on scope)"
 font_size = 22
 outline_size = 5
 
@@ -896,13 +917,13 @@ use_collision = true
 size = Vector3(8, 0.6, 8)
 material = SubResource("Mat_accent")
 
-[node name="HermanPlaceholder" type="StaticBody3D" parent="BossRoom" unique_id=390130768]
+[node name="HermenPlaceholder" type="StaticBody3D" parent="BossRoom" unique_id=390130768]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 60, -41.7, 0)
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="BossRoom/HermanPlaceholder" unique_id=1140710885]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="BossRoom/HermenPlaceholder" unique_id=1140710885]
 shape = SubResource("Shape_boss_marker")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="BossRoom/HermanPlaceholder" unique_id=2098779386]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="BossRoom/HermenPlaceholder" unique_id=2098779386]
 material_override = SubResource("Mat_boss_marker")
 mesh = SubResource("Mesh_boss_marker")
 
@@ -923,7 +944,7 @@ spot_angle = 28.0
 transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 43.5, -40.5, 0)
 modulate = Color(1, 0.85, 0.45, 1)
 text = "◆ BOSS DOOR ◆
-HERMAN HULST
+HERMEN HULST
 Instrument of the Portfolio
 (placeholder mesh · 1–2 mechanics TBD)"
 font_size = 28
@@ -932,7 +953,7 @@ outline_size = 6
 [node name="BossTitle" type="Label3D" parent="BossRoom" unique_id=834056411]
 transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 66, -38, 0)
 modulate = Color(1, 0.55, 0.4, 1)
-text = "HERMAN HULST
+text = "HERMEN HULST
 Instrument of the Portfolio
 Synergy is eternal."
 font_size = 36

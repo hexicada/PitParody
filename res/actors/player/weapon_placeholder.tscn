@@ -1,30 +1,81 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=8 format=3]
 
-[ext_resource type="Script" path="res://res/actors/player/weapon_view_model.gd" id="1_h54qb"]
+[ext_resource type="Script" path="res://res/actors/player/amusing_firearm.gd" id="1_gun"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_body"]
-size = Vector3(0.18, 0.1, 0.45)
+size = Vector3(0.16, 0.12, 0.42)
 
 [sub_resource type="BoxMesh" id="BoxMesh_barrel"]
-size = Vector3(0.05, 0.04, 0.25)
+size = Vector3(0.045, 0.045, 0.32)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_weapon"]
-albedo_color = Color(0.168627, 0.168627, 0.188235, 1)
-metallic = 0.5
-roughness = 0.55
+[sub_resource type="BoxMesh" id="BoxMesh_mag"]
+size = Vector3(0.08, 0.16, 0.1)
+
+[sub_resource type="StandardMaterial3D" id="Mat_gun"]
+albedo_color = Color(0.22, 0.24, 0.28, 1)
+metallic = 0.65
+roughness = 0.4
+
+[sub_resource type="StandardMaterial3D" id="Mat_accent"]
+albedo_color = Color(0.95, 0.75, 0.2, 1)
+metallic = 0.7
+roughness = 0.3
+emission_enabled = true
+emission = Color(0.8, 0.55, 0.1, 1)
+emission_energy_multiplier = 0.5
+
+[sub_resource type="StandardMaterial3D" id="Mat_flash"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(1, 0.92, 0.55, 0.9)
+emission_enabled = true
+emission = Color(1, 0.85, 0.3, 1)
+emission_energy_multiplier = 2.5
+
+[sub_resource type="SphereMesh" id="Mesh_flash"]
+radius = 0.06
+height = 0.12
+radial_segments = 8
+rings = 4
 
 [node name="WeaponViewModel" type="Node3D"]
-script = ExtResource("1_h54qb")
-weapon_name = "Placeholder SMG"
+script = ExtResource("1_gun")
+weapon_name = "The Feedback Loop"
 hip_offset = Vector3(0.06, -0.06, 0.02)
 ads_offset = Vector3(0.01, -0.015, -0.11)
 
 [node name="BodyMesh" type="MeshInstance3D" parent="."]
-position = Vector3(0.09, -0.01, -0.22)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.08, -0.01, -0.2)
+material_override = SubResource("Mat_gun")
 mesh = SubResource("BoxMesh_body")
-material_override = SubResource("StandardMaterial3D_weapon")
+
+[node name="GoldRail" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.08, 0.05, -0.2)
+material_override = SubResource("Mat_accent")
+mesh = SubResource("BoxMesh_barrel")
 
 [node name="BarrelMesh" type="MeshInstance3D" parent="."]
-position = Vector3(0.1, -0.005, -0.54)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.09, 0.0, -0.52)
+material_override = SubResource("Mat_gun")
 mesh = SubResource("BoxMesh_barrel")
-material_override = SubResource("StandardMaterial3D_weapon")
+
+[node name="Mag" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.08, -0.12, -0.12)
+material_override = SubResource("Mat_gun")
+mesh = SubResource("BoxMesh_mag")
+
+[node name="MuzzleFlash" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.09, 0.0, -0.72)
+visible = false
+material_override = SubResource("Mat_flash")
+cast_shadow = 0
+mesh = SubResource("Mesh_flash")
+
+[node name="FlavorLabel" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.08, 0.1, -0.15)
+pixel_size = 0.0012
+text = "The Feedback Loop"
+font_size = 18
+modulate = Color(1, 0.9, 0.5, 1)
+outline_size = 4
+horizontal_alignment = 1
