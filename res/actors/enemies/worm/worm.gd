@@ -10,8 +10,10 @@ class_name CaveWorm
 @export var patrol_half_extent: float = 3.5
 @export var aggro_range: float = 9.0
 @export var lunge_range: float = 4.5
-@export var contact_damage: float = 12.0
-@export var contact_cooldown: float = 0.7
+@export var contact_damage: float = 18.0
+@export var contact_cooldown: float = 0.55
+@export var contact_radius: float = 1.85
+@export var contact_height: float = 2.4
 @export var gravity: float = 18.0
 
 var health: float
@@ -35,9 +37,14 @@ func _ready() -> void:
 	_duplicate_segment_materials()
 	if _name_label:
 		_name_label.text = display_name
+	# Area is a backup; distance checks are the reliable path for CharacterBody players.
 	if _damage_area:
-		_damage_area.body_entered.connect(_on_damage_body_entered)
 		_damage_area.monitoring = true
+		_damage_area.monitorable = false
+		_damage_area.collision_layer = 0
+		_damage_area.collision_mask = 1
+		if not _damage_area.body_entered.is_connected(_on_damage_body_entered):
+			_damage_area.body_entered.connect(_on_damage_body_entered)
 
 
 func _duplicate_segment_materials() -> void:
@@ -102,7 +109,7 @@ func _physics_process(delta: float) -> void:
 		_mesh_root.position.y = 0.35 + sin(t * 1.7) * 0.05
 
 	move_and_slide()
-	_try_contact_damage()
+	_try_contact_damage(player, dist, to_player)
 
 
 func take_damage(amount: float, _from: Node = null) -> void:
@@ -143,26 +150,43 @@ func _find_player() -> Node3D:
 	return players[0] as Node3D
 
 
-func _try_contact_damage() -> void:
-	if _contact_cd > 0.0 or _damage_area == null:
+func _try_contact_damage(player: Node3D, planar_dist: float, _to_player: Vector3) -> void:
+	if _dead or _contact_cd > 0.0:
 		return
-	for body in _damage_area.get_overlapping_bodies():
-		if _apply_damage_to(body):
+
+	# Reliable path: distance to player (Area3D vs CharacterBody is flaky when layers don't overlap).
+	if player and _player_in_contact_range(player, planar_dist):
+		if _hurt_player(player):
 			_contact_cd = contact_cooldown
 			return
+
+	# Backup: Area overlap, in case something else damageable walks through.
+	if _damage_area:
+		for body in _damage_area.get_overlapping_bodies():
+			if _hurt_player(body):
+				_contact_cd = contact_cooldown
+				return
+
+
+func _player_in_contact_range(player: Node3D, planar_dist: float) -> bool:
+	if planar_dist > contact_radius:
+		return false
+	# Player origin is at feet; worm origin near body center — allow generous vertical slop.
+	var dy := absf(player.global_position.y - global_position.y)
+	return dy <= contact_height
 
 
 func _on_damage_body_entered(body: Node) -> void:
 	if _dead or _contact_cd > 0.0:
 		return
-	if _apply_damage_to(body):
+	if _hurt_player(body):
 		_contact_cd = contact_cooldown
 
 
-func _apply_damage_to(body: Node) -> bool:
-	var n: Node = body
+func _hurt_player(target: Node) -> bool:
+	var n: Node = target
 	while n:
-		if n.has_method("take_damage") and n.is_in_group("player"):
+		if n.is_in_group("player") and n.has_method("take_damage"):
 			n.call("take_damage", contact_damage, self)
 			return true
 		n = n.get_parent()
