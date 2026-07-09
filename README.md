@@ -25,10 +25,16 @@ Optional remote: `upstream` → `https://github.com/hexicada/Fate.git` for cherr
 
 1. Open Godot 4.6
 2. Import / open this folder
-3. Main scene: `res/levels/test_arena.tscn`
+3. Main scene: `res/levels/pit_of_hulst.tscn` (legacy sandbox: `test_arena.tscn`)
 
 Or use `open_project.bat` if present.
 
 ## Status
 
-Fork freshly cut. Dungeon content (encounters, Herman Hulst boss, corporate heresy) TBD.
+**Blockout playable.** One level scene with three areas:
+
+1. **Entry yard** — expanded moon surface, central pit, comedy signage, mantle blocks  
+2. **Worm cave** — short tunnel stub from shaft landing (no jump puzzle, zero enemies)  
+3. **Boss room** — Herman Hulst placeholder dais/mesh  
+
+Path: spawn → fall the shaft → walk the cave → boss door. Encounters/mechanics TBD.

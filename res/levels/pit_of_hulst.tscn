@@ -1,0 +1,952 @@
+[gd_scene format=3 uid="uid://7v7cxlbwj3b5"]
+
+[ext_resource type="Sky" uid="uid://wm5praaxa7ce" path="res://res/assets/skyboxes/new_sky.tres" id="1_sky"]
+[ext_resource type="PackedScene" uid="uid://dir4p3muy3vrt" path="res://res/actors/player/player.tscn" id="2_player"]
+[ext_resource type="Texture2D" uid="uid://dbde4o56l2p4h" path="res://res/assets/shaders/moon_surface_regolith_01.png" id="3_regolith"]
+
+[sub_resource type="Environment" id="Environment_main"]
+background_mode = 2
+background_color = Color(0.333333, 0.533333, 0.74902, 1)
+sky = ExtResource("1_sky")
+ambient_light_source = 3
+ambient_light_color = Color(0.45, 0.5, 0.57, 1)
+ambient_light_energy = 0.85
+tonemap_mode = 2
+volumetric_fog_enabled = true
+volumetric_fog_density = 0.008
+volumetric_fog_albedo = Color(0.55, 0.72, 0.45, 1)
+volumetric_fog_emission = Color(0.08, 0.18, 0.06, 1)
+volumetric_fog_emission_energy = 0.35
+volumetric_fog_ambient_inject = 0.15
+
+[sub_resource type="StandardMaterial3D" id="Mat_moon"]
+albedo_texture = ExtResource("3_regolith")
+roughness = 0.88
+uv1_scale = Vector3(6, 6, 6)
+
+[sub_resource type="StandardMaterial3D" id="Mat_bank"]
+albedo_color = Color(0.76, 0.64, 0.6, 1)
+albedo_texture = ExtResource("3_regolith")
+roughness = 0.88
+uv1_scale = Vector3(2.5, 2.5, 2.5)
+
+[sub_resource type="StandardMaterial3D" id="Mat_bank_warm"]
+albedo_color = Color(0.82, 0.58, 0.55, 1)
+albedo_texture = ExtResource("3_regolith")
+roughness = 0.82
+uv1_scale = Vector3(2, 2, 2)
+
+[sub_resource type="StandardMaterial3D" id="Mat_hole_cover"]
+transparency = 1
+cull_mode = 2
+albedo_color = Color(0.25, 0.85, 0.35, 0.12)
+roughness = 0.15
+emission_enabled = true
+emission = Color(0.15, 0.55, 0.2, 1)
+emission_energy_multiplier = 0.4
+disable_receive_shadows = true
+
+[sub_resource type="CylinderMesh" id="Mesh_hole_cover"]
+top_radius = 1.0
+bottom_radius = 1.0
+height = 0.08
+radial_segments = 32
+
+[sub_resource type="StandardMaterial3D" id="Mat_mouth_flesh"]
+albedo_color = Color(0.78, 0.38, 0.42, 1)
+metallic = 0.02
+roughness = 0.62
+emission_enabled = true
+emission = Color(0.35, 0.08, 0.1, 1)
+emission_energy_multiplier = 0.18
+
+[sub_resource type="StandardMaterial3D" id="Mat_mouth_torn"]
+albedo_color = Color(0.9, 0.5, 0.52, 1)
+roughness = 0.48
+emission_enabled = true
+emission = Color(0.4, 0.1, 0.12, 1)
+emission_energy_multiplier = 0.22
+
+[sub_resource type="StandardMaterial3D" id="Mat_mouth_scar"]
+albedo_color = Color(0.42, 0.22, 0.26, 1)
+roughness = 0.78
+
+[sub_resource type="BoxShape3D" id="Shape_mantle"]
+size = Vector3(2.5, 1.2, 2.5)
+
+[sub_resource type="StandardMaterial3D" id="Mat_mantle"]
+albedo_color = Color(0.55, 0.52, 0.48, 1)
+roughness = 0.85
+
+[sub_resource type="BoxMesh" id="Mesh_mantle"]
+size = Vector3(2.5, 1.2, 2.5)
+
+[sub_resource type="StandardMaterial3D" id="Mat_shaft"]
+albedo_color = Color(0.2, 0.24, 0.18, 1)
+roughness = 0.92
+
+[sub_resource type="StandardMaterial3D" id="Mat_flesh"]
+albedo_color = Color(0.86, 0.48, 0.52, 1)
+metallic = 0.05
+roughness = 0.55
+emission_enabled = true
+emission = Color(0.45, 0.12, 0.15, 1)
+emission_energy_multiplier = 0.25
+
+[sub_resource type="CylinderMesh" id="Mesh_flesh_sleeve"]
+top_radius = 14.4
+bottom_radius = 14.35
+height = 9.0
+radial_segments = 32
+rings = 1
+cap_top = false
+cap_bottom = false
+
+[sub_resource type="StandardMaterial3D" id="Mat_flesh_deep"]
+albedo_color = Color(0.62, 0.28, 0.34, 1)
+roughness = 0.62
+emission_enabled = true
+emission = Color(0.28, 0.06, 0.1, 1)
+emission_energy_multiplier = 0.15
+
+[sub_resource type="StandardMaterial3D" id="Mat_hive_transition"]
+albedo_color = Color(0.38, 0.28, 0.32, 1)
+roughness = 0.88
+
+[sub_resource type="CylinderMesh" id="Mesh_hive_sleeve"]
+top_radius = 14.35
+bottom_radius = 14.4
+height = 10.0
+radial_segments = 32
+rings = 1
+cap_top = false
+cap_bottom = false
+
+[sub_resource type="SphereMesh" id="Mesh_cell"]
+radius = 0.55
+height = 1.1
+radial_segments = 10
+rings = 6
+
+[sub_resource type="FogMaterial" id="FogMat_green"]
+density = 0.09
+albedo = Color(0.35, 0.75, 0.28, 1)
+emission = Color(0.1, 0.35, 0.08, 1)
+height_falloff = 0.15
+edge_fade = 0.35
+
+[sub_resource type="FogMaterial" id="FogMat_green_deep"]
+density = 0.12
+albedo = Color(0.25, 0.6, 0.22, 1)
+emission = Color(0.06, 0.28, 0.05, 1)
+height_falloff = 0.08
+edge_fade = 0.4
+
+[sub_resource type="ParticleProcessMaterial" id="Particle_mist"]
+emission_shape = 6
+emission_ring_axis = Vector3(0, 1, 0)
+emission_ring_height = 6.0
+emission_ring_radius = 9.5
+emission_ring_inner_radius = 4.0
+emission_ring_cone_angle = 90.0
+direction = Vector3(0, 1, 0)
+spread = 18.0
+initial_velocity_min = 0.15
+initial_velocity_max = 0.55
+angular_velocity_min = -12.0
+angular_velocity_max = 12.0
+gravity = Vector3(0, 0.12, 0)
+scale_min = 0.8
+scale_max = 2.2
+color = Color(0.5, 0.9, 0.4, 0.35)
+
+[sub_resource type="StandardMaterial3D" id="Mat_mist_particle"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(0.45, 0.85, 0.4, 0.22)
+disable_receive_shadows = true
+billboard_mode = 1
+
+[sub_resource type="QuadMesh" id="Mesh_mist_quad"]
+material = SubResource("Mat_mist_particle")
+size = Vector2(1.4, 1.4)
+
+[sub_resource type="StandardMaterial3D" id="Mat_ledge"]
+albedo_color = Color(0.62, 0.48, 0.28, 1)
+metallic = 0.2
+roughness = 0.7
+
+[sub_resource type="StandardMaterial3D" id="Mat_cave"]
+albedo_color = Color(0.28, 0.18, 0.32, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="Mat_cave_floor"]
+albedo_color = Color(0.2, 0.14, 0.22, 1)
+roughness = 0.95
+
+[sub_resource type="StandardMaterial3D" id="Mat_accent"]
+albedo_color = Color(0.75, 0.55, 0.15, 1)
+metallic = 0.4
+roughness = 0.45
+
+[sub_resource type="StandardMaterial3D" id="Mat_boss"]
+albedo_color = Color(0.35, 0.36, 0.4, 1)
+metallic = 0.15
+roughness = 0.75
+
+[sub_resource type="StandardMaterial3D" id="Mat_boss_floor"]
+albedo_color = Color(0.42, 0.38, 0.28, 1)
+metallic = 0.25
+roughness = 0.7
+
+[sub_resource type="BoxShape3D" id="Shape_boss_marker"]
+size = Vector3(2.5, 3.5, 2.5)
+
+[sub_resource type="StandardMaterial3D" id="Mat_boss_marker"]
+albedo_color = Color(0.7, 0.15, 0.2, 1)
+roughness = 0.5
+emission_enabled = true
+emission = Color(0.45, 0.05, 0.08, 1)
+emission_energy_multiplier = 0.6
+
+[sub_resource type="BoxMesh" id="Mesh_boss_marker"]
+size = Vector3(2.5, 3.5, 2.5)
+
+[node name="PitOfHulst" type="Node3D" unique_id=1813475336]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=168680141]
+environment = SubResource("Environment_main")
+
+[node name="Sun" type="DirectionalLight3D" parent="." unique_id=169590355]
+transform = Transform3D(0.819152, -0.451984, 0.353129, 0, 0.615662, 0.788011, -0.573576, -0.645501, 0.50432, 0, 18, 0)
+light_energy = 1.35
+shadow_enabled = true
+
+[node name="FillLight" type="DirectionalLight3D" parent="." unique_id=1746598188]
+transform = Transform3D(-0.707107, -0.5, 0.5, 0, 0.707107, 0.707107, -0.707107, 0.5, -0.5, 0, 0, 0)
+light_color = Color(0.7, 0.75, 0.9, 1)
+light_energy = 0.25
+
+[node name="EntryYard" type="Node3D" parent="." unique_id=1000449731]
+
+[node name="YardFloor" type="CSGCombiner3D" parent="EntryYard" unique_id=1349754515]
+use_collision = true
+
+[node name="FloorSlab" type="CSGBox3D" parent="EntryYard/YardFloor" unique_id=1797024074]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+size = Vector3(96, 1, 96)
+material = SubResource("Mat_moon")
+
+[node name="PitOpening" type="CSGCylinder3D" parent="EntryYard/YardFloor" unique_id=161903161]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+operation = 2
+radius = 14.5
+height = 3.0
+sides = 32
+
+[node name="WestBankMain" type="CSGSphere3D" parent="EntryYard/YardFloor" unique_id=483683498]
+transform = Transform3D(9.5, 0, 0, 0, 4.2, 0, 0, 0, 9.2, -17.5, 0.35, 0.5)
+radius = 1.0
+radial_segments = 18
+rings = 12
+material = SubResource("Mat_bank")
+
+[node name="WestBankCap" type="CSGSphere3D" parent="EntryYard/YardFloor" unique_id=245604500]
+transform = Transform3D(6.5, 0, 0, 0, 2.8, 0, 0, 0, 6.2, -16.8, 1.6, 0.3)
+radius = 1.0
+radial_segments = 16
+rings = 10
+material = SubResource("Mat_bank_warm")
+
+[node name="WestBankInner" type="CSGSphere3D" parent="EntryYard/YardFloor" unique_id=1924037286]
+transform = Transform3D(4.8, 0, 0, 0, 2.2, 0, 0, 0, 4.8, -14, 0.55, 0.2)
+radius = 1.0
+radial_segments = 14
+rings = 10
+material = SubResource("Mat_bank_warm")
+
+[node name="EastBankMain" type="CSGSphere3D" parent="EntryYard/YardFloor" unique_id=20266441]
+transform = Transform3D(9.5, 0, 0, 0, 4.2, 0, 0, 0, 9.2, 17.22424, 0.35, 0.5)
+radius = 1.0
+radial_segments = 18
+rings = 12
+material = SubResource("Mat_bank")
+
+[node name="EastBankCap" type="CSGSphere3D" parent="EntryYard/YardFloor" unique_id=1285052134]
+transform = Transform3D(6.5, 0, 0, 0, 2.8, 0, 0, 0, 6.2, 16.8, 1.6, 0.3)
+radius = 1.0
+radial_segments = 16
+rings = 10
+material = SubResource("Mat_bank_warm")
+
+[node name="EastBankInner" type="CSGSphere3D" parent="EntryYard/YardFloor" unique_id=1385803810]
+transform = Transform3D(4.8, 0, 0, 0, 2.2, 0, 0, 0, 4.8, 14, 0.55, 0.2)
+radius = 1.0
+radial_segments = 14
+rings = 10
+material = SubResource("Mat_bank_warm")
+
+[node name="BankClear" type="CSGCylinder3D" parent="EntryYard/YardFloor" unique_id=1431900930]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+operation = 2
+radius = 14.7
+height = 12.0
+sides = 32
+
+[node name="HoleCover" type="MeshInstance3D" parent="EntryYard" unique_id=2118303638]
+transform = Transform3D(14, 0, 0, 0, 1, 0, 0, 0, 14, 0, 0.04, 0)
+material_override = SubResource("Mat_hole_cover")
+cast_shadow = 0
+mesh = SubResource("Mesh_hole_cover")
+
+[node name="HoleCoverInner" type="MeshInstance3D" parent="EntryYard" unique_id=885669066]
+transform = Transform3D(12.5, 0, 0, 0, 1, 0, 0, 0, 12.5, 0, 0.06, 0)
+material_override = SubResource("Mat_hole_cover")
+cast_shadow = 0
+mesh = SubResource("Mesh_hole_cover")
+
+[node name="MouthFlesh" type="CSGCombiner3D" parent="EntryYard" unique_id=395455040]
+use_collision = true
+
+[node name="OuterRing" type="CSGTorus3D" parent="EntryYard/MouthFlesh" unique_id=136430122]
+transform = Transform3D(1, 0, 0, 0, 0.55, 0, 0, 0, 1, 0, -0.47017175, 0)
+inner_radius = 4.715
+outer_radius = 16.215
+sides = 28
+ring_sides = 10
+material = SubResource("Mat_mouth_flesh")
+
+[node name="InnerPucker" type="CSGTorus3D" parent="EntryYard/MouthFlesh" unique_id=986936016]
+transform = Transform3D(1, 0, 0, 0, 0.45, 0, 0, 0, 1, 0, 0.28, 0)
+inner_radius = 7.666
+outer_radius = 15.636
+sides = 28
+ring_sides = 10
+material = SubResource("Mat_mouth_torn")
+
+[node name="DeepLip" type="CSGTorus3D" parent="EntryYard/MouthFlesh" unique_id=87050699]
+transform = Transform3D(1, 0, 0, 0, 0.5, 0, 0, 0, 1, 0, 0.4589529, 0)
+inner_radius = 0.55
+outer_radius = 15.0
+sides = 24
+ring_sides = 8
+material = SubResource("Mat_mouth_scar")
+
+[node name="PuckerBulgeN" type="CSGSphere3D" parent="EntryYard/MouthFlesh" unique_id=761908715]
+transform = Transform3D(2.6, 0, 0, 0, 0.85, 0, 0, 0, 2, 0, 0.35, -15)
+radius = 1.0
+rings = 8
+material = SubResource("Mat_mouth_flesh")
+
+[node name="PuckerBulgeS" type="CSGSphere3D" parent="EntryYard/MouthFlesh" unique_id=1752219144]
+transform = Transform3D(2.6, 0, 0, 0, 0.85, 0, 0, 0, 2, 0, 0.35, 15)
+radius = 1.0
+rings = 8
+material = SubResource("Mat_mouth_flesh")
+
+[node name="PuckerBulgeW" type="CSGSphere3D" parent="EntryYard/MouthFlesh" unique_id=231604897]
+transform = Transform3D(2, 0, 0, 0, 0.9, 0, 0, 0, 2.4, -15, 0.35, 0)
+radius = 1.0
+rings = 8
+material = SubResource("Mat_mouth_torn")
+
+[node name="PuckerBulgeE" type="CSGSphere3D" parent="EntryYard/MouthFlesh" unique_id=1063922340]
+transform = Transform3D(2, 0, 0, 0, 0.9, 0, 0, 0, 2.4, 15, 0.35, 0)
+radius = 1.0
+rings = 8
+material = SubResource("Mat_mouth_torn")
+
+[node name="ShareholderNickA" type="CSGSphere3D" parent="EntryYard/MouthFlesh" unique_id=846814781]
+transform = Transform3D(1.5, 0, 0, 0, 0.55, 0, 0, 0, 1.3, -11, 0.4, 10)
+radius = 1.0
+radial_segments = 10
+material = SubResource("Mat_mouth_scar")
+
+[node name="ShareholderNickB" type="CSGSphere3D" parent="EntryYard/MouthFlesh" unique_id=195087341]
+transform = Transform3D(1.4, 0, 0, 0, 0.5, 0, 0, 0, 1.2, 10.5, 0.38, -9.5)
+radius = 1.0
+radial_segments = 10
+material = SubResource("Mat_mouth_scar")
+
+[node name="ShaveUpperLip" type="CSGBox3D" parent="EntryYard/MouthFlesh" unique_id=1207101883]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.7142212, 0)
+operation = 2
+size = Vector3(50, 4, 50)
+
+[node name="MouthAperture" type="CSGCylinder3D" parent="EntryYard/MouthFlesh" unique_id=1484036395]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
+operation = 2
+radius = 14.4
+height = 6.0
+sides = 32
+
+[node name="YardLights" type="Node3D" parent="EntryYard" unique_id=791201502]
+
+[node name="PitGlow" type="OmniLight3D" parent="EntryYard/YardLights" unique_id=1330212196]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -2, 0)
+light_color = Color(0.55, 0.9, 0.45, 1)
+light_energy = 2.2
+omni_range = 24.0
+
+[node name="CrackGlow" type="OmniLight3D" parent="EntryYard/YardLights" unique_id=555084404]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -6, 0)
+light_color = Color(0.35, 0.85, 0.4, 1)
+light_energy = 1.8
+omni_range = 18.0
+
+[node name="FleshMouthGlow" type="OmniLight3D" parent="EntryYard/YardLights" unique_id=1074271835]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+light_color = Color(0.95, 0.4, 0.45, 1)
+light_energy = 1.4
+omni_range = 14.0
+
+[node name="MantleBlocks" type="Node3D" parent="EntryYard" unique_id=770771912]
+
+[node name="BlockA" type="StaticBody3D" parent="EntryYard/MantleBlocks" unique_id=2007226208]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18, 0.6, 22)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="EntryYard/MantleBlocks/BlockA" unique_id=1401787328]
+shape = SubResource("Shape_mantle")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="EntryYard/MantleBlocks/BlockA" unique_id=1113237664]
+material_override = SubResource("Mat_mantle")
+mesh = SubResource("Mesh_mantle")
+
+[node name="BlockB" type="StaticBody3D" parent="EntryYard/MantleBlocks" unique_id=2109087173]
+transform = Transform3D(1, 0, 0, 0, 1.5, 0, 0, 0, 1, -14, 0.9, 20)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="EntryYard/MantleBlocks/BlockB" unique_id=834791008]
+shape = SubResource("Shape_mantle")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="EntryYard/MantleBlocks/BlockB" unique_id=785123464]
+material_override = SubResource("Mat_mantle")
+mesh = SubResource("Mesh_mantle")
+
+[node name="BlockC" type="StaticBody3D" parent="EntryYard/MantleBlocks" unique_id=1399236455]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 0.6, 24)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="EntryYard/MantleBlocks/BlockC" unique_id=292585510]
+shape = SubResource("Shape_mantle")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="EntryYard/MantleBlocks/BlockC" unique_id=80280817]
+material_override = SubResource("Mat_mantle")
+mesh = SubResource("Mesh_mantle")
+
+[node name="Signage" type="Node3D" parent="EntryYard" unique_id=948602768]
+
+[node name="WelcomeSign" type="Label3D" parent="EntryYard/Signage" unique_id=146636453]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.2, 34)
+modulate = Color(0.95, 0.9, 0.7, 1)
+text = "PIT OF HULST
+Heresy of the Live Service
+— Fan Parody · Not Affiliated —"
+font_size = 48
+outline_size = 8
+
+[node name="PitSign" type="Label3D" parent="EntryYard/Signage" unique_id=2060807396]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8, 18.5)
+modulate = Color(1, 0.75, 0.35, 1)
+text = "▼ MANDATORY ENGAGEMENT FUNNEL ▼
+Enter Herman. Exit dignity.
+(High-effort corporate posterior.)"
+outline_size = 6
+
+[node name="DisclaimerSign" type="Label3D" parent="EntryYard/Signage" unique_id=6679062]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 28, 2.2, 0)
+modulate = Color(0.8, 0.85, 0.95, 1)
+text = "AUTHORIZED GUARDIANS ONLY
+Bring your own Light
+(and a sense of humor)"
+font_size = 28
+outline_size = 6
+
+[node name="Shaft" type="Node3D" parent="." unique_id=1963879059]
+
+[node name="Walls" type="CSGCombiner3D" parent="Shaft" unique_id=1370506394]
+use_collision = true
+
+[node name="OuterCylinder" type="CSGCylinder3D" parent="Shaft/Walls" unique_id=723000041]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -22, 0)
+radius = 16.5
+height = 44.0
+sides = 32
+material = SubResource("Mat_shaft")
+
+[node name="InnerBore" type="CSGCylinder3D" parent="Shaft/Walls" unique_id=390960515]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -22, 0)
+operation = 2
+radius = 14.5
+height = 46.0
+sides = 32
+
+[node name="CaveDoorCut" type="CSGBox3D" parent="Shaft/Walls" unique_id=36140986]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, -42.2, 0)
+operation = 2
+size = Vector3(4, 3.8, 5.5)
+
+[node name="Lining" type="Node3D" parent="Shaft" unique_id=1462174337]
+
+[node name="FleshSleeve" type="MeshInstance3D" parent="Shaft/Lining" unique_id=278397779]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -4.5, 0)
+material_override = SubResource("Mat_flesh")
+cast_shadow = 0
+mesh = SubResource("Mesh_flesh_sleeve")
+
+[node name="FleshSleeveDeep" type="MeshInstance3D" parent="Shaft/Lining" unique_id=2112867433]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -10.5, 0)
+material_override = SubResource("Mat_flesh_deep")
+cast_shadow = 0
+mesh = SubResource("Mesh_flesh_sleeve")
+
+[node name="HiveSleeve" type="MeshInstance3D" parent="Shaft/Lining" unique_id=1952082918]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -20, 0)
+material_override = SubResource("Mat_hive_transition")
+cast_shadow = 0
+mesh = SubResource("Mesh_hive_sleeve")
+
+[node name="HiveSleeveLower" type="MeshInstance3D" parent="Shaft/Lining" unique_id=597797376]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -30, 0)
+material_override = SubResource("Mat_shaft")
+cast_shadow = 0
+mesh = SubResource("Mesh_hive_sleeve")
+
+[node name="SquamousCells" type="Node3D" parent="Shaft/Lining" unique_id=1397375978]
+
+[node name="Ring0" type="Node3D" parent="Shaft/Lining/SquamousCells" unique_id=1867811402]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.2, 0)
+
+[node name="C0" type="MeshInstance3D" parent="Shaft/Lining/SquamousCells/Ring0" unique_id=1347314276]
+transform = Transform3D(1.4, 0, 0, 0, 1.1, 0, 0, 0, 0.7, 11.5, 0, 0)
+material_override = SubResource("Mat_flesh")
+cast_shadow = 0
+mesh = SubResource("Mesh_cell")
+
+[node name="C1" type="MeshInstance3D" parent="Shaft/Lining/SquamousCells/Ring0" unique_id=1305150210]
+transform = Transform3D(0.99, 0, 0.99, 0, 1.1, 0, -0.99, 0, 0.99, 8.13, 0, 8.13)
+material_override = SubResource("Mat_flesh")
+cast_shadow = 0
+mesh = SubResource("Mesh_cell")
+
+[node name="C2" type="MeshInstance3D" parent="Shaft/Lining/SquamousCells/Ring0" unique_id=261156706]
+transform = Transform3D(0.7, 0, 1.4, 0, 1.1, 0, -1.4, 0, 0.7, 0, 0, 11.5)
+material_override = SubResource("Mat_flesh")
+cast_shadow = 0
+mesh = SubResource("Mesh_cell")
+
+[node name="C3" type="MeshInstance3D" parent="Shaft/Lining/SquamousCells/Ring0" unique_id=1068933554]
+transform = Transform3D(-0.99, 0, 0.99, 0, 1.1, 0, -0.99, 0, -0.99, -8.13, 0, 8.13)
+material_override = SubResource("Mat_flesh")
+cast_shadow = 0
+mesh = SubResource("Mesh_cell")
+
+[node name="C4" type="MeshInstance3D" parent="Shaft/Lining/SquamousCells/Ring0" unique_id=1597590049]
+transform = Transform3D(-1.4, 0, 0, 0, 1.1, 0, 0, 0, -0.7, -11.5, 0, 0)
+material_override = SubResource("Mat_flesh")
+cast_shadow = 0
+mesh = SubResource("Mesh_cell")
+
+[node name="C5" type="MeshInstance3D" parent="Shaft/Lining/SquamousCells/Ring0" unique_id=739773763]
+transform = Transform3D(-0.99, 0, -0.99, 0, 1.1, 0, 0.99, 0, -0.99, -8.13, 0, -8.13)
+material_override = SubResource("Mat_flesh")
+cast_shadow = 0
+mesh = SubResource("Mesh_cell")
+
+[node name="C6" type="MeshInstance3D" parent="Shaft/Lining/SquamousCells/Ring0" unique_id=1585591790]
+transform = Transform3D(0.7, 0, -1.4, 0, 1.1, 0, 1.4, 0, 0.7, 0, 0, -11.5)
+material_override = SubResource("Mat_flesh")
+cast_shadow = 0
+mesh = SubResource("Mesh_cell")
+
+[node name="C7" type="MeshInstance3D" parent="Shaft/Lining/SquamousCells/Ring0" unique_id=820420401]
+transform = Transform3D(0.99, 0, -0.99, 0, 1.1, 0, 0.99, 0, 0.99, 8.13, 0, -8.13)
+material_override = SubResource("Mat_flesh")
+cast_shadow = 0
+mesh = SubResource("Mesh_cell")
+
+[node name="Ring1" type="Node3D" parent="Shaft/Lining/SquamousCells" unique_id=420276361]
+transform = Transform3D(0.92388, 0, 0.382683, 0, 1, 0, -0.382683, 0, 0.92388, 0, -3.4, 0)
+
+[node name="C0" type="MeshInstance3D" parent="Shaft/Lining/SquamousCells/Ring1" unique_id=1809454493]
+transform = Transform3D(1.25, 0, 0, 0, 1, 0, 0, 0, 0.65, 11.45, 0, 0)
+material_override = SubResource("Mat_flesh")
+cast_shadow = 0
+mesh = SubResource("Mesh_cell")
+
+[node name="C1" type="MeshInstance3D" parent="Shaft/Lining/SquamousCells/Ring1" unique_id=254485655]
+transform = Transform3D(0.88, 0, 0.88, 0, 1, 0, -0.88, 0, 0.88, 8.1, 0, 8.1)
+material_override = SubResource("Mat_flesh")
+cast_shadow = 0
+mesh = SubResource("Mesh_cell")
+
+[node name="C2" type="MeshInstance3D" parent="Shaft/Lining/SquamousCells/Ring1" unique_id=1225592194]
+transform = Transform3D(0.65, 0, 1.25, 0, 1, 0, -1.25, 0, 0.65, 0, 0, 11.45)
+material_override = SubResource("Mat_flesh")
+cast_shadow = 0
+mesh = SubResource("Mesh_cell")
+
+[node name="C3" type="MeshInstance3D" parent="Shaft/Lining/SquamousCells/Ring1" unique_id=320562302]
+transform = Transform3D(-0.88, 0, 0.88, 0, 1, 0, -0.88, 0, -0.88, -8.1, 0, 8.1)
+material_override = SubResource("Mat_flesh")
+cast_shadow = 0
+mesh = SubResource("Mesh_cell")
+
+[node name="C4" type="MeshInstance3D" parent="Shaft/Lining/SquamousCells/Ring1" unique_id=1792244926]
+transform = Transform3D(-1.25, 0, 0, 0, 1, 0, 0, 0, -0.65, -11.45, 0, 0)
+material_override = SubResource("Mat_flesh")
+cast_shadow = 0
+mesh = SubResource("Mesh_cell")
+
+[node name="C5" type="MeshInstance3D" parent="Shaft/Lining/SquamousCells/Ring1" unique_id=1288229549]
+transform = Transform3D(-0.88, 0, -0.88, 0, 1, 0, 0.88, 0, -0.88, -8.1, 0, -8.1)
+material_override = SubResource("Mat_flesh")
+cast_shadow = 0
+mesh = SubResource("Mesh_cell")
+
+[node name="C6" type="MeshInstance3D" parent="Shaft/Lining/SquamousCells/Ring1" unique_id=1387911272]
+transform = Transform3D(0.65, 0, -1.25, 0, 1, 0, 1.25, 0, 0.65, 0, 0, -11.45)
+material_override = SubResource("Mat_flesh")
+cast_shadow = 0
+mesh = SubResource("Mesh_cell")
+
+[node name="C7" type="MeshInstance3D" parent="Shaft/Lining/SquamousCells/Ring1" unique_id=360403132]
+transform = Transform3D(0.88, 0, -0.88, 0, 1, 0, 0.88, 0, 0.88, 8.1, 0, -8.1)
+material_override = SubResource("Mat_flesh")
+cast_shadow = 0
+mesh = SubResource("Mesh_cell")
+
+[node name="Ring2" type="Node3D" parent="Shaft/Lining/SquamousCells" unique_id=1380772846]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -5.8, 0)
+
+[node name="C0" type="MeshInstance3D" parent="Shaft/Lining/SquamousCells/Ring2" unique_id=352411314]
+transform = Transform3D(1.15, 0, 0, 0, 0.95, 0, 0, 0, 0.6, 11.4, 0, 0)
+material_override = SubResource("Mat_flesh_deep")
+cast_shadow = 0
+mesh = SubResource("Mesh_cell")
+
+[node name="C1" type="MeshInstance3D" parent="Shaft/Lining/SquamousCells/Ring2" unique_id=582047038]
+transform = Transform3D(0.81, 0, 0.81, 0, 0.95, 0, -0.81, 0, 0.81, 8.06, 0, 8.06)
+material_override = SubResource("Mat_flesh_deep")
+cast_shadow = 0
+mesh = SubResource("Mesh_cell")
+
+[node name="C2" type="MeshInstance3D" parent="Shaft/Lining/SquamousCells/Ring2" unique_id=1421560630]
+transform = Transform3D(0.6, 0, 1.15, 0, 0.95, 0, -1.15, 0, 0.6, 0, 0, 11.4)
+material_override = SubResource("Mat_flesh_deep")
+cast_shadow = 0
+mesh = SubResource("Mesh_cell")
+
+[node name="C3" type="MeshInstance3D" parent="Shaft/Lining/SquamousCells/Ring2" unique_id=1851076118]
+transform = Transform3D(-0.81, 0, 0.81, 0, 0.95, 0, -0.81, 0, -0.81, -8.06, 0, 8.06)
+material_override = SubResource("Mat_flesh_deep")
+cast_shadow = 0
+mesh = SubResource("Mesh_cell")
+
+[node name="C4" type="MeshInstance3D" parent="Shaft/Lining/SquamousCells/Ring2" unique_id=1364441619]
+transform = Transform3D(-1.15, 0, 0, 0, 0.95, 0, 0, 0, -0.6, -11.4, 0, 0)
+material_override = SubResource("Mat_flesh_deep")
+cast_shadow = 0
+mesh = SubResource("Mesh_cell")
+
+[node name="C5" type="MeshInstance3D" parent="Shaft/Lining/SquamousCells/Ring2" unique_id=1493281073]
+transform = Transform3D(-0.81, 0, -0.81, 0, 0.95, 0, 0.81, 0, -0.81, -8.06, 0, -8.06)
+material_override = SubResource("Mat_flesh_deep")
+cast_shadow = 0
+mesh = SubResource("Mesh_cell")
+
+[node name="C6" type="MeshInstance3D" parent="Shaft/Lining/SquamousCells/Ring2" unique_id=752165205]
+transform = Transform3D(0.6, 0, -1.15, 0, 0.95, 0, 1.15, 0, 0.6, 0, 0, -11.4)
+material_override = SubResource("Mat_flesh_deep")
+cast_shadow = 0
+mesh = SubResource("Mesh_cell")
+
+[node name="C7" type="MeshInstance3D" parent="Shaft/Lining/SquamousCells/Ring2" unique_id=1449810142]
+transform = Transform3D(0.81, 0, -0.81, 0, 0.95, 0, 0.81, 0, 0.81, 8.06, 0, -8.06)
+material_override = SubResource("Mat_flesh_deep")
+cast_shadow = 0
+mesh = SubResource("Mesh_cell")
+
+[node name="Ring3Sparse" type="Node3D" parent="Shaft/Lining/SquamousCells" unique_id=698700072]
+transform = Transform3D(0.707107, 0, 0.707107, 0, 1, 0, -0.707107, 0, 0.707107, 0, -8.2, 0)
+
+[node name="C0" type="MeshInstance3D" parent="Shaft/Lining/SquamousCells/Ring3Sparse" unique_id=1586984575]
+transform = Transform3D(1, 0, 0, 0, 0.85, 0, 0, 0, 0.55, 11.35, 0, 0)
+material_override = SubResource("Mat_hive_transition")
+cast_shadow = 0
+mesh = SubResource("Mesh_cell")
+
+[node name="C1" type="MeshInstance3D" parent="Shaft/Lining/SquamousCells/Ring3Sparse" unique_id=1905161472]
+transform = Transform3D(0.55, 0, 1, 0, 0.85, 0, -1, 0, 0.55, 0, 0, 11.35)
+material_override = SubResource("Mat_hive_transition")
+cast_shadow = 0
+mesh = SubResource("Mesh_cell")
+
+[node name="C2" type="MeshInstance3D" parent="Shaft/Lining/SquamousCells/Ring3Sparse" unique_id=1212374367]
+transform = Transform3D(-1, 0, 0, 0, 0.85, 0, 0, 0, -0.55, -11.35, 0, 0)
+material_override = SubResource("Mat_hive_transition")
+cast_shadow = 0
+mesh = SubResource("Mesh_cell")
+
+[node name="C3" type="MeshInstance3D" parent="Shaft/Lining/SquamousCells/Ring3Sparse" unique_id=1696967680]
+transform = Transform3D(0.55, 0, -1, 0, 0.85, 0, 1, 0, 0.55, 0, 0, -11.35)
+material_override = SubResource("Mat_hive_transition")
+cast_shadow = 0
+mesh = SubResource("Mesh_cell")
+
+[node name="GreenMist" type="Node3D" parent="Shaft" unique_id=1562761165]
+
+[node name="MistMid" type="FogVolume" parent="Shaft/GreenMist" unique_id=1922130781]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -18, 0)
+size = Vector3(22, 14, 22)
+shape = 2
+material = SubResource("FogMat_green")
+
+[node name="MistDeep" type="FogVolume" parent="Shaft/GreenMist" unique_id=1563433564]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -34, 0)
+size = Vector3(20, 18, 20)
+shape = 2
+material = SubResource("FogMat_green_deep")
+
+[node name="MistParticles" type="GPUParticles3D" parent="Shaft/GreenMist" unique_id=2087792847]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -28, 0)
+amount = 48
+lifetime = 7.0
+preprocess = 3.0
+explosiveness = 0.05
+randomness = 0.4
+visibility_aabb = AABB(-14, -8, -14, 28, 24, 28)
+process_material = SubResource("Particle_mist")
+draw_pass_1 = SubResource("Mesh_mist_quad")
+
+[node name="Landing" type="CSGCylinder3D" parent="Shaft" unique_id=1443938581]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, -44.5, 0)
+use_collision = true
+radius = 15.0
+height = 1.0
+sides = 32
+material = SubResource("Mat_shaft")
+
+[node name="LandingBridge" type="CSGBox3D" parent="Shaft" unique_id=297538816]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.5, -44.5, 0)
+use_collision = true
+size = Vector3(10, 1, 6)
+material = SubResource("Mat_shaft")
+
+[node name="Ledges" type="Node3D" parent="Shaft" unique_id=1737781479]
+
+[node name="Set1" type="Node3D" parent="Shaft/Ledges" unique_id=330377474]
+
+[node name="BeamX" type="CSGBox3D" parent="Shaft/Ledges/Set1" unique_id=839372180]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -11, 0)
+use_collision = true
+size = Vector3(28.5, 0.55, 1.9)
+material = SubResource("Mat_ledge")
+
+[node name="BeamZ" type="CSGBox3D" parent="Shaft/Ledges/Set1" unique_id=233764538]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -10.4, 0)
+use_collision = true
+size = Vector3(1.9, 0.55, 28.5)
+material = SubResource("Mat_ledge")
+
+[node name="Set2" type="Node3D" parent="Shaft/Ledges" unique_id=637675587]
+
+[node name="BeamDiagA" type="CSGBox3D" parent="Shaft/Ledges/Set2" unique_id=1655902564]
+transform = Transform3D(0.707107, 0, 0.707107, 0, 1, 0, -0.707107, 0, 0.707107, 0, -22, 0)
+use_collision = true
+size = Vector3(28.5, 0.55, 1.9)
+material = SubResource("Mat_ledge")
+
+[node name="BeamDiagB" type="CSGBox3D" parent="Shaft/Ledges/Set2" unique_id=1112273529]
+transform = Transform3D(0.707107, 0, -0.707107, 0, 1, 0, 0.707107, 0, 0.707107, 0, -21.4, 0)
+use_collision = true
+size = Vector3(28.5, 0.55, 1.9)
+material = SubResource("Mat_ledge")
+
+[node name="Set3" type="Node3D" parent="Shaft/Ledges" unique_id=1674627482]
+
+[node name="BeamX" type="CSGBox3D" parent="Shaft/Ledges/Set3" unique_id=147797564]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -33, 1.2)
+use_collision = true
+size = Vector3(28.5, 0.55, 1.9)
+material = SubResource("Mat_ledge")
+
+[node name="BeamZ" type="CSGBox3D" parent="Shaft/Ledges/Set3" unique_id=1142532125]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.2, -32.4, 0)
+use_collision = true
+size = Vector3(1.9, 0.55, 28.5)
+material = SubResource("Mat_ledge")
+
+[node name="ShaftLightTop" type="OmniLight3D" parent="Shaft" unique_id=1483005926]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -5, 0)
+light_color = Color(1, 0.45, 0.5, 1)
+light_energy = 2.0
+omni_range = 16.0
+
+[node name="ShaftLightMid" type="OmniLight3D" parent="Shaft" unique_id=501580586]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -20, 0)
+light_color = Color(0.55, 0.85, 0.35, 1)
+light_energy = 2.2
+omni_range = 18.0
+
+[node name="ShaftLightBottom" type="OmniLight3D" parent="Shaft" unique_id=849276916]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -40, 0)
+light_color = Color(0.4, 0.75, 0.35, 1)
+light_energy = 2.6
+omni_range = 16.0
+
+[node name="ShaftSign" type="Label3D" parent="Shaft" unique_id=921407255]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, -13.8, -41, 0)
+modulate = Color(1, 0.85, 0.5, 1)
+text = "YOU ARE HERE:
+Q3 Descent Metrics
+(wider · deeper · rounder)"
+font_size = 28
+outline_size = 6
+
+[node name="WormCave" type="Node3D" parent="." unique_id=1816044409]
+
+[node name="Tunnel" type="CSGCombiner3D" parent="WormCave" unique_id=770453973]
+use_collision = true
+
+[node name="Shell" type="CSGBox3D" parent="WormCave/Tunnel" unique_id=486147593]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30, -42.25, 0)
+size = Vector3(30, 5, 8)
+material = SubResource("Mat_cave")
+
+[node name="Interior" type="CSGBox3D" parent="WormCave/Tunnel" unique_id=1757342257]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30, -42.1, 0)
+operation = 2
+size = Vector3(31, 3.6, 5.2)
+
+[node name="CaveFloor" type="CSGBox3D" parent="WormCave" unique_id=2025773409]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30.5, -44.5, 0)
+use_collision = true
+size = Vector3(33, 1, 6)
+material = SubResource("Mat_cave_floor")
+
+[node name="WormHazardStubA" type="CSGBox3D" parent="WormCave" unique_id=736054693]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22, -43.4, -1.8)
+use_collision = true
+size = Vector3(2.2, 1.2, 1.4)
+material = SubResource("Mat_accent")
+
+[node name="WormHazardStubB" type="CSGBox3D" parent="WormCave" unique_id=888731568]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32, -43.5, 1.6)
+use_collision = true
+size = Vector3(2.8, 1, 1.6)
+material = SubResource("Mat_accent")
+
+[node name="CaveLightA" type="OmniLight3D" parent="WormCave" unique_id=1362178596]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, -41, 0)
+light_color = Color(0.75, 0.4, 0.9, 1)
+light_energy = 1.6
+omni_range = 12.0
+
+[node name="CaveLightB" type="OmniLight3D" parent="WormCave" unique_id=455826140]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 34, -41, 0)
+light_color = Color(0.65, 0.35, 0.85, 1)
+light_energy = 1.6
+omni_range = 12.0
+
+[node name="CaveEntranceSign" type="Label3D" parent="WormCave" unique_id=745583039]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 16.5, -41.2, 0)
+modulate = Color(0.9, 0.7, 1, 1)
+text = "WORM CAVE
+No long jump puzzle
+(we checked with Legal)"
+font_size = 26
+outline_size = 6
+
+[node name="CaveMidSign" type="Label3D" parent="WormCave" unique_id=1038576165]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 28, -40.8, -2.4)
+modulate = Color(0.85, 0.75, 0.95, 1)
+text = "Future worms go here
+Please do not feed the roadmap"
+font_size = 22
+outline_size = 5
+
+[node name="BossRoom" type="Node3D" parent="." unique_id=918591799]
+
+[node name="Shell" type="CSGCombiner3D" parent="BossRoom" unique_id=567303481]
+use_collision = true
+
+[node name="Outer" type="CSGBox3D" parent="BossRoom/Shell" unique_id=1357109558]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 56, -40.5, 0)
+size = Vector3(28, 10, 26)
+material = SubResource("Mat_boss")
+
+[node name="Inner" type="CSGBox3D" parent="BossRoom/Shell" unique_id=1050694011]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 56, -40.2, 0)
+operation = 2
+size = Vector3(25, 8.5, 23)
+
+[node name="EntryDoorCut" type="CSGBox3D" parent="BossRoom/Shell" unique_id=1890861566]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 42.2, -42.1, 0)
+operation = 2
+size = Vector3(3, 3.8, 5.2)
+
+[node name="BossFloor" type="CSGBox3D" parent="BossRoom" unique_id=912062649]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 55.5, -44.5, 0)
+use_collision = true
+size = Vector3(28, 1, 23)
+material = SubResource("Mat_boss_floor")
+
+[node name="Dais" type="CSGBox3D" parent="BossRoom" unique_id=479099375]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 60, -43.7, 0)
+use_collision = true
+size = Vector3(8, 0.6, 8)
+material = SubResource("Mat_accent")
+
+[node name="HermanPlaceholder" type="StaticBody3D" parent="BossRoom" unique_id=390130768]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 60, -41.7, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="BossRoom/HermanPlaceholder" unique_id=1140710885]
+shape = SubResource("Shape_boss_marker")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="BossRoom/HermanPlaceholder" unique_id=2098779386]
+material_override = SubResource("Mat_boss_marker")
+mesh = SubResource("Mesh_boss_marker")
+
+[node name="BossLight" type="OmniLight3D" parent="BossRoom" unique_id=1646156744]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 56, -36, 0)
+light_color = Color(1, 0.85, 0.55, 1)
+light_energy = 3.5
+omni_range = 22.0
+
+[node name="BossSpot" type="SpotLight3D" parent="BossRoom" unique_id=1380006464]
+transform = Transform3D(1, 0, 0, 0, 0.0871557, 0.996195, 0, -0.996195, 0.0871557, 60, -35, 0)
+light_color = Color(1, 0.4, 0.35, 1)
+light_energy = 4.0
+spot_range = 18.0
+spot_angle = 28.0
+
+[node name="BossDoorSign" type="Label3D" parent="BossRoom" unique_id=1802732809]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 43.5, -40.5, 0)
+modulate = Color(1, 0.85, 0.45, 1)
+text = "◆ BOSS DOOR ◆
+HERMAN HULST
+Instrument of the Portfolio
+(placeholder mesh · 1–2 mechanics TBD)"
+font_size = 28
+outline_size = 6
+
+[node name="BossTitle" type="Label3D" parent="BossRoom" unique_id=834056411]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 66, -38, 0)
+modulate = Color(1, 0.55, 0.4, 1)
+text = "HERMAN HULST
+Instrument of the Portfolio
+Synergy is eternal."
+font_size = 36
+outline_size = 8
+
+[node name="OKRPlaque" type="Label3D" parent="BossRoom" unique_id=1399421371]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 56, -39, -11)
+modulate = Color(0.9, 0.9, 0.95, 1)
+text = "OKRs this encounter:
+1. Survive
+2. Ship vibes
+3. Do not acquire the studio"
+font_size = 24
+outline_size = 5
+
+[node name="Player" parent="." unique_id=1412272118 instance=ExtResource("2_player")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.15, 32)
