@@ -5,6 +5,8 @@
 [ext_resource type="Texture2D" uid="uid://dbde4o56l2p4h" path="res://res/assets/shaders/moon_surface_regolith_01.png" id="3_regolith"]
 [ext_resource type="PackedScene" path="res://res/actors/enemies/worm/worm.tscn" id="4_worm"]
 [ext_resource type="PackedScene" path="res://res/actors/bosses/instrument/instrument_boss.tscn" id="5_instrument"]
+[ext_resource type="PackedScene" path="res://res/levels/parts/entry_poh_homage.tscn" id="6_entry_homage"]
+[ext_resource type="PackedScene" path="res://res/levels/parts/shaft_poh_homage.tscn" id="7_shaft_homage"]
 
 [sub_resource type="Environment" id="Environment_main"]
 background_mode = 2
@@ -222,8 +224,8 @@ light_energy = 0.25
 use_collision = true
 
 [node name="FloorSlab" type="CSGBox3D" parent="EntryYard/YardFloor" unique_id=1797024074]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
-size = Vector3(96, 1, 96)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 12)
+size = Vector3(110, 1, 130)
 material = SubResource("Mat_moon")
 
 [node name="PitOpening" type="CSGCylinder3D" parent="EntryYard/YardFloor" unique_id=161903161]
@@ -389,6 +391,9 @@ light_color = Color(0.95, 0.4, 0.45, 1)
 light_energy = 1.4
 omni_range = 14.0
 
+[node name="PoHHomage" parent="EntryYard" unique_id=862894958 instance=ExtResource("6_entry_homage")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.45406342, 1.6879349, -0.9489441)
+
 [node name="MantleBlocks" type="Node3D" parent="EntryYard" unique_id=770771912]
 
 [node name="BlockA" type="StaticBody3D" parent="EntryYard/MantleBlocks" unique_id=2007226208]
@@ -424,7 +429,7 @@ mesh = SubResource("Mesh_mantle")
 [node name="Signage" type="Node3D" parent="EntryYard" unique_id=948602768]
 
 [node name="WelcomeSign" type="Label3D" parent="EntryYard/Signage" unique_id=146636453]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0245705, 22.09407, 0.44013214)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.466496, 22.370882, -0.11433792)
 pixel_size = 0.067
 billboard = 1
 modulate = Color(0.95, 0.9, 0.7, 1)
@@ -438,8 +443,8 @@ outline_size = 10
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8, 18.5)
 modulate = Color(1, 0.75, 0.35, 1)
 text = "▼ MANDATORY ENGAGEMENT FUNNEL ▼
-Enter the thoughtform.
-(Low effort corporate posterior.)"
+Overlook → rim → pit → tunnels.
+(Homage to a certain lunar dungeon.)"
 outline_size = 6
 
 [node name="DisclaimerSign" type="Label3D" parent="EntryYard/Signage" unique_id=6679062]
@@ -452,6 +457,8 @@ font_size = 28
 outline_size = 6
 
 [node name="Shaft" type="Node3D" parent="." unique_id=1963879059]
+
+[node name="PoHHomage" parent="Shaft" unique_id=219650005 instance=ExtResource("7_shaft_homage")]
 
 [node name="Walls" type="CSGCombiner3D" parent="Shaft" unique_id=1370506394]
 use_collision = true
@@ -709,7 +716,7 @@ process_material = SubResource("Particle_mist")
 draw_pass_1 = SubResource("Mesh_mist_quad")
 
 [node name="Landing" type="CSGCylinder3D" parent="Shaft" unique_id=1443938581]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, -44.5, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.36477995, -44.446636, 0.0010612011)
 use_collision = true
 radius = 15.0
 height = 1.0
@@ -865,7 +872,7 @@ font_size = 26
 outline_size = 6
 
 [node name="CaveMidSign" type="Label3D" parent="WormCave" unique_id=1038576165]
-transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 28, -40.8, -2.4)
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 28, -40.8, 0.5396459)
 modulate = Color(0.85, 0.75, 0.95, 1)
 text = "Please do not feed the roadmap
 (they feed on scope)"
@@ -952,4 +959,4 @@ font_size = 24
 outline_size = 5
 
 [node name="Player" parent="." unique_id=1412272118 instance=ExtResource("2_player")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.15, 32)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.0625505, 48)

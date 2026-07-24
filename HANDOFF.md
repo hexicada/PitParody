@@ -33,12 +33,16 @@ Workspace: `C:\Users\hexicada\Projects\PitOfHulst`
 ## Playable flow (current)
 
 ```text
-[1] ENTRY YARD     moon surface, central pit, signage
-        ↓ fall shaft (ledges, green mist)
+[1] ENTRY YARD     overlook spawn → broken bridge / rim walk
+                   wall-of-doors gag, cliff "org chart" towers, central pit
+        ↓ fall shaft (cross ledges + side platforms, sealed warrens)
 [2] WORM CAVE      Board Thrall / roadmap fauna (no jump puzzle)
         ↓
 [3] BOSS ROOM      The Instrument (thoughtform) — Zulmak-shaped fight
 ```
+
+**PoH homage notes (entry/pit):** modular parts under `res/levels/parts/`  
+(`entry_poh_homage.tscn`, `shaft_poh_homage.tscn`) — cliff towers, rim approach, door wall, side ledges.
 
 **Boss (The Instrument):**
 

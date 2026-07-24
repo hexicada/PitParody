@@ -1,0 +1,391 @@
+[gd_scene load_steps=12 format=3]
+
+[ext_resource type="Texture2D" path="res://res/assets/skyboxes/earth_globe.jpg" id="1_earth"]
+
+[sub_resource type="StandardMaterial3D" id="Mat_rock"]
+albedo_color = Color(0.28, 0.26, 0.24, 1)
+roughness = 0.92
+
+[sub_resource type="StandardMaterial3D" id="Mat_hive_tower"]
+albedo_color = Color(0.32, 0.14, 0.16, 1)
+roughness = 0.8
+emission_enabled = true
+emission = Color(0.25, 0.05, 0.06, 1)
+emission_energy_multiplier = 0.15
+
+[sub_resource type="StandardMaterial3D" id="Mat_rune"]
+albedo_color = Color(0.35, 0.95, 0.4, 1)
+roughness = 0.4
+emission_enabled = true
+emission = Color(0.2, 0.9, 0.3, 1)
+emission_energy_multiplier = 1.6
+
+[sub_resource type="StandardMaterial3D" id="Mat_bridge"]
+albedo_color = Color(0.4, 0.38, 0.35, 1)
+roughness = 0.88
+
+[sub_resource type="StandardMaterial3D" id="Mat_door"]
+albedo_color = Color(0.18, 0.16, 0.2, 1)
+roughness = 0.7
+metallic = 0.2
+
+[sub_resource type="StandardMaterial3D" id="Mat_spire"]
+albedo_color = Color(0.22, 0.12, 0.14, 1)
+roughness = 0.75
+emission_enabled = true
+emission = Color(0.15, 0.04, 0.05, 1)
+emission_energy_multiplier = 0.25
+
+[sub_resource type="StandardMaterial3D" id="Mat_earth"]
+albedo_texture = ExtResource("1_earth")
+roughness = 0.85
+metallic = 0.05
+texture_filter = 0
+emission_enabled = true
+emission_texture = ExtResource("1_earth")
+emission_energy_multiplier = 0.35
+shading_mode = 0
+
+[sub_resource type="BoxMesh" id="Mesh_box"]
+
+[sub_resource type="SphereMesh" id="Mesh_earth"]
+radius = 48.0
+height = 96.0
+radial_segments = 48
+rings = 24
+
+[sub_resource type="BoxShape3D" id="Shape_unit"]
+size = Vector3(1, 1, 1)
+
+[node name="EntryPoHHomage" type="Node3D"]
+
+; -----------------------------------------------------------------------------
+; APPROACH — overlook spawn + broken bridge toward the pit (homage: rim traverse)
+; Pit centre remains (0,0). Player walks -Z toward the hole.
+; -----------------------------------------------------------------------------
+[node name="Approach" type="Node3D" parent="."]
+
+[node name="OverlookPad" type="StaticBody3D" parent="Approach"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.15, 46)
+
+[node name="Mesh" type="MeshInstance3D" parent="Approach/OverlookPad"]
+transform = Transform3D(10, 0, 0, 0, 0.4, 0, 0, 0, 8, 0, 0, 0)
+material_override = SubResource("Mat_bridge")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="Approach/OverlookPad"]
+transform = Transform3D(10, 0, 0, 0, 0.4, 0, 0, 0, 8, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+[node name="BridgeA" type="StaticBody3D" parent="Approach"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 38)
+
+[node name="Mesh" type="MeshInstance3D" parent="Approach/BridgeA"]
+transform = Transform3D(4.5, 0, 0, 0, 0.35, 0, 0, 0, 6, 0, 0, 0)
+material_override = SubResource("Mat_bridge")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="Approach/BridgeA"]
+transform = Transform3D(4.5, 0, 0, 0, 0.35, 0, 0, 0, 6, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+[node name="BridgeGapEdge" type="StaticBody3D" parent="Approach"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.2, 0.05, 32)
+
+[node name="Mesh" type="MeshInstance3D" parent="Approach/BridgeGapEdge"]
+transform = Transform3D(1.6, 0, 0, 0, 0.3, 0, 0, 0, 3.5, 0, 0, 0)
+material_override = SubResource("Mat_bridge")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="Approach/BridgeGapEdge"]
+transform = Transform3D(1.6, 0, 0, 0, 0.3, 0, 0, 0, 3.5, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+[node name="BridgeGapEdgeR" type="StaticBody3D" parent="Approach"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.4, 0.05, 31.5)
+
+[node name="Mesh" type="MeshInstance3D" parent="Approach/BridgeGapEdgeR"]
+transform = Transform3D(1.4, 0, 0, 0, 0.3, 0, 0, 0, 2.8, 0, 0, 0)
+material_override = SubResource("Mat_bridge")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="Approach/BridgeGapEdgeR"]
+transform = Transform3D(1.4, 0, 0, 0, 0.3, 0, 0, 0, 2.8, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+[node name="RimStepL" type="StaticBody3D" parent="Approach"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0.2, 26)
+
+[node name="Mesh" type="MeshInstance3D" parent="Approach/RimStepL"]
+transform = Transform3D(3.5, 0, 0, 0, 0.5, 0, 0, 0, 4, 0, 0, 0)
+material_override = SubResource("Mat_rock")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="Approach/RimStepL"]
+transform = Transform3D(3.5, 0, 0, 0, 0.5, 0, 0, 0, 4, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+[node name="RimStepR" type="StaticBody3D" parent="Approach"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 0.25, 24)
+
+[node name="Mesh" type="MeshInstance3D" parent="Approach/RimStepR"]
+transform = Transform3D(3.2, 0, 0, 0, 0.55, 0, 0, 0, 3.5, 0, 0, 0)
+material_override = SubResource("Mat_rock")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="Approach/RimStepR"]
+transform = Transform3D(3.2, 0, 0, 0, 0.55, 0, 0, 0, 3.5, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+[node name="ApproachSign" type="Label3D" parent="Approach"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.5, 46)
+billboard = 1
+text = "SCARLET KEEP ANNEX — FORBIDDEN RIM
+(Please do not fall. Falling is mandatory.)"
+font_size = 28
+modulate = Color(0.85, 0.9, 0.75, 1)
+outline_size = 6
+horizontal_alignment = 1
+
+; -----------------------------------------------------------------------------
+; CLIFF FACADE — "city in the rock" silhouette (homage: towers on cliff face)
+; North of pit (-Z), reads as hive/corporate fortress when looking past the hole.
+; -----------------------------------------------------------------------------
+[node name="CliffFacade" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -38)
+
+[node name="CliffWall" type="StaticBody3D" parent="CliffFacade"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 10, 0)
+
+[node name="Mesh" type="MeshInstance3D" parent="CliffFacade/CliffWall"]
+transform = Transform3D(70, 0, 0, 0, 22, 0, 0, 0, 6, 0, 0, 0)
+material_override = SubResource("Mat_rock")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="CliffFacade/CliffWall"]
+transform = Transform3D(70, 0, 0, 0, 22, 0, 0, 0, 6, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+[node name="TowerA" type="StaticBody3D" parent="CliffFacade"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18, 8, 4)
+
+[node name="Mesh" type="MeshInstance3D" parent="CliffFacade/TowerA"]
+transform = Transform3D(6, 0, 0, 0, 16, 0, 0, 0, 6, 0, 0, 0)
+material_override = SubResource("Mat_hive_tower")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="CliffFacade/TowerA"]
+transform = Transform3D(6, 0, 0, 0, 16, 0, 0, 0, 6, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+[node name="RuneA" type="MeshInstance3D" parent="CliffFacade/TowerA"]
+transform = Transform3D(2.2, 0, 0, 0, 2.2, 0, 0, 0, 0.2, 0, 6, 3.2)
+material_override = SubResource("Mat_rune")
+cast_shadow = 0
+mesh = SubResource("Mesh_box")
+
+[node name="LabelA" type="Label3D" parent="CliffFacade/TowerA"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.5, 3.5)
+billboard = 1
+text = "OKR"
+font_size = 48
+modulate = Color(0.5, 1, 0.45, 1)
+outline_size = 8
+horizontal_alignment = 1
+
+[node name="TowerB" type="StaticBody3D" parent="CliffFacade"]
+; Off-center so the tall SpireBehindPit owns the spawn sightline (x=0).
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 12, 5)
+
+[node name="Mesh" type="MeshInstance3D" parent="CliffFacade/TowerB"]
+transform = Transform3D(7, 0, 0, 0, 22, 0, 0, 0, 7, 0, 0, 0)
+material_override = SubResource("Mat_hive_tower")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="CliffFacade/TowerB"]
+transform = Transform3D(7, 0, 0, 0, 22, 0, 0, 0, 7, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+[node name="RuneB" type="MeshInstance3D" parent="CliffFacade/TowerB"]
+transform = Transform3D(2.5, 0, 0, 0, 2.5, 0, 0, 0, 0.2, 0, 8, 3.6)
+material_override = SubResource("Mat_rune")
+cast_shadow = 0
+mesh = SubResource("Mesh_box")
+
+[node name="LabelB" type="Label3D" parent="CliffFacade/TowerB"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 11, 4)
+billboard = 1
+text = "BOARD"
+font_size = 42
+modulate = Color(0.5, 1, 0.45, 1)
+outline_size = 8
+horizontal_alignment = 1
+
+[node name="TowerC" type="StaticBody3D" parent="CliffFacade"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 7, 3)
+
+[node name="Mesh" type="MeshInstance3D" parent="CliffFacade/TowerC"]
+transform = Transform3D(5.5, 0, 0, 0, 14, 0, 0, 0, 5.5, 0, 0, 0)
+material_override = SubResource("Mat_hive_tower")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="CliffFacade/TowerC"]
+transform = Transform3D(5.5, 0, 0, 0, 14, 0, 0, 0, 5.5, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+[node name="RuneC" type="MeshInstance3D" parent="CliffFacade/TowerC"]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 0.2, 0, 5, 2.9)
+material_override = SubResource("Mat_rune")
+cast_shadow = 0
+mesh = SubResource("Mesh_box")
+
+[node name="LabelC" type="Label3D" parent="CliffFacade/TowerC"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7.5, 3.2)
+billboard = 1
+text = "SYNERGY"
+font_size = 36
+modulate = Color(0.5, 1, 0.45, 1)
+outline_size = 8
+horizontal_alignment = 1
+
+[node name="Beacon" type="OmniLight3D" parent="CliffFacade"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 24, 6)
+light_color = Color(0.4, 1, 0.45, 1)
+light_energy = 4.5
+omni_range = 40.0
+
+[node name="CliffCaption" type="Label3D" parent="CliffFacade"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 22, 8)
+billboard = 1
+text = "LIVE-SERVICE KEEP
+(towers of the org chart)"
+font_size = 32
+modulate = Color(0.7, 0.95, 0.65, 1)
+outline_size = 6
+horizontal_alignment = 1
+
+; -----------------------------------------------------------------------------
+; WALL OF DOORS — almost all sealed; the real path is the pit (homage: door wall)
+; East side of approach so you pass it walking to the hole.
+; -----------------------------------------------------------------------------
+[node name="WallOfDoors" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22, 0, 36)
+
+[node name="Wall" type="StaticBody3D" parent="WallOfDoors"]
+
+[node name="Mesh" type="MeshInstance3D" parent="WallOfDoors/Wall"]
+transform = Transform3D(2, 0, 0, 0, 8, 0, 0, 0, 22, 0, 4, 0)
+material_override = SubResource("Mat_rock")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="WallOfDoors/Wall"]
+transform = Transform3D(2, 0, 0, 0, 8, 0, 0, 0, 22, 0, 4, 0)
+shape = SubResource("Shape_unit")
+
+[node name="Door0" type="MeshInstance3D" parent="WallOfDoors"]
+transform = Transform3D(0.25, 0, 0, 0, 3.2, 0, 0, 0, 2.2, -1.2, 2.2, -7)
+material_override = SubResource("Mat_door")
+mesh = SubResource("Mesh_box")
+
+[node name="Door1" type="MeshInstance3D" parent="WallOfDoors"]
+transform = Transform3D(0.25, 0, 0, 0, 3.2, 0, 0, 0, 2.2, -1.2, 2.2, -2.5)
+material_override = SubResource("Mat_door")
+mesh = SubResource("Mesh_box")
+
+[node name="Door2" type="MeshInstance3D" parent="WallOfDoors"]
+transform = Transform3D(0.25, 0, 0, 0, 3.2, 0, 0, 0, 2.2, -1.2, 2.2, 2)
+material_override = SubResource("Mat_door")
+mesh = SubResource("Mesh_box")
+
+[node name="Door3" type="MeshInstance3D" parent="WallOfDoors"]
+transform = Transform3D(0.25, 0, 0, 0, 3.2, 0, 0, 0, 2.2, -1.2, 2.2, 6.5)
+material_override = SubResource("Mat_door")
+mesh = SubResource("Mesh_box")
+
+[node name="DoorSign" type="Label3D" parent="WallOfDoors"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -1.5, 5.5, 0)
+text = "WALL OF DOORS
+All sealed for Q4.
+Real path: the hole you shouldn't enter."
+font_size = 24
+modulate = Color(0.9, 0.85, 0.7, 1)
+outline_size = 5
+horizontal_alignment = 1
+
+[node name="CrackHint" type="Label3D" parent="WallOfDoors"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -1.5, 1.2, 9)
+text = "→ low crack? nope.
+↓ mandatory funnel"
+font_size = 20
+modulate = Color(0.6, 1, 0.55, 1)
+outline_size = 4
+horizontal_alignment = 1
+
+; -----------------------------------------------------------------------------
+; SPIRE BEHIND THE PIT — dead ahead from spawn (looking -Z past the hole)
+; Spawn (0, ~0.5, 48) faces -Z; pit at z=0; spire past far cliff so first frame
+; reads: approach → pit mouth → tall tower.
+; -----------------------------------------------------------------------------
+[node name="SpireBehindPit" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -52)
+
+[node name="Shaft" type="MeshInstance3D" parent="SpireBehindPit"]
+transform = Transform3D(7, 0, 0, 0, 72, 0, 0, 0, 7, 0, 36, 0)
+material_override = SubResource("Mat_spire")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="SpireBehindPit"]
+transform = Transform3D(7, 0, 0, 0, 72, 0, 0, 0, 7, 0, 36, 0)
+shape = SubResource("Shape_unit")
+
+[node name="Cap" type="MeshInstance3D" parent="SpireBehindPit"]
+transform = Transform3D(11, 0, 0, 0, 6, 0, 0, 0, 11, 0, 74, 0)
+material_override = SubResource("Mat_hive_tower")
+mesh = SubResource("Mesh_box")
+
+[node name="SpireRune" type="MeshInstance3D" parent="SpireBehindPit"]
+transform = Transform3D(4, 0, 0, 0, 4, 0, 0, 0, 0.3, 0, 48, 3.6)
+material_override = SubResource("Mat_rune")
+cast_shadow = 0
+mesh = SubResource("Mesh_box")
+
+[node name="SpireLight" type="OmniLight3D" parent="SpireBehindPit"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 76, 0)
+light_color = Color(0.45, 1, 0.5, 1)
+light_energy = 8.0
+omni_range = 90.0
+
+[node name="SpireLabel" type="Label3D" parent="SpireBehindPit"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 80, 0)
+billboard = 1
+text = "PILLAR OF Q4
+(do not climb)"
+font_size = 40
+modulate = Color(0.55, 1, 0.5, 1)
+outline_size = 8
+horizontal_alignment = 1
+
+; -----------------------------------------------------------------------------
+; EARTH IN THE SKY — same x=0 sightline as the spire from spawn
+; Along ray spawn-eye → just above spire cap so pit / spire / Earth stack in FOV.
+; -----------------------------------------------------------------------------
+[node name="SkyProps" type="Node3D" parent="."]
+
+[node name="Earth" type="MeshInstance3D" parent="SkyProps"]
+; Lower elevation (~20–25° above horizon when looking at the tower) so Earth
+; sits in spawn FOV instead of straight overhead.
+transform = Transform3D(0.9, 0, 0.44, 0, 1, 0, -0.44, 0, 0.9, 0, 98, -130)
+material_override = SubResource("Mat_earth")
+cast_shadow = 0
+gi_mode = 0
+mesh = SubResource("Mesh_earth")
+
+[node name="EarthCaption" type="Label3D" parent="SkyProps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 62, -70)
+billboard = 1
+text = "EARTH
+(yes, you're on the Moon)"
+font_size = 40
+modulate = Color(0.75, 0.85, 1, 0.85)
+outline_size = 8
+horizontal_alignment = 1
