@@ -1,96 +1,131 @@
 # Handoff: Pit of Hulst
 
-Workspace for this project: `C:\Users\hexicada\Projects\PitOfHulst`
-
-**Do not edit** `C:\Users\hexicada\Projects\Fate` while building the parody.
-
----
-
-## Projects
-
-| Path | Role |
-|------|------|
-| `C:\Users\hexicada\Projects\Fate` | Serious Godot FPS — leave alone |
-| `C:\Users\hexicada\Projects\PitOfHulst` | Joke dungeon fork — all work here |
+Workspace: `C:\Users\hexicada\Projects\PitOfHulst`  
+**Do not edit** `C:\Users\hexicada\Projects\Fate` while building this parody.
 
 ---
 
 ## What this is
 
-- Godot **4.6** FPS prototype forked from Fate (sibling folder, full git history).
-- **Title:** **Pit of Hulst: Heresy of the Live Service**
-- Destiny **Pit of Heresy** parody (Vault of Cars energy, more structured).
-- Final boss: **Hermen Hulst** (e.g. *Instrument of the Portfolio*).
-- Tone: affectionate roast + corporate cosmic horror (live service as dark religion).
-- Fan parody — not affiliated with Bungie / Destiny / PlayStation.
+| | |
+|--|--|
+| **Title** | Pit of Hulst: Heresy of the Live Service |
+| **Engine** | Godot **4.6** |
+| **Genre** | Short Destiny *Pit of Heresy* parody FPS (Vault of Cars energy, more structured) |
+| **Tone** | Affectionate roast + corporate cosmic horror (live service as dark religion) |
+| **Legal** | Fan parody — **not** affiliated with Bungie / Destiny / PlayStation. **No real-person likenesses.** |
+
+### Projects
+
+| Path | Role |
+|------|------|
+| `Fate` | Serious Godot FPS — leave alone |
+| `PitOfHulst` (this) | Joke dungeon — all work here |
+| GitHub `hexicada/PitParody` | `origin` remote |
+
+### Remotes
+
+- `origin` → `https://github.com/hexicada/PitParody.git`
+- `upstream` → `https://github.com/hexicada/Fate.git` (cherry-picks only; **never** push parody here)
 
 ---
 
-## Git state
-
-- Branch: `master`
-- History: Fate commits + fork commit: *Establish Pit of Hulst fork identity*
-- `project.godot` name: `"Pit of Hulst"`
-- README present with title + disclaimer
-- Remote: **`upstream` only** → `https://github.com/hexicada/Fate.git`
-- **No `origin`** yet
-- Upstream tracking on `master` was unset (avoid accidental push to Fate)
-
----
-
-## Inherited tech (from Fate)
-
-- Main scene: `res/levels/test_arena.tscn` (moon floor, skybox, mantle blocks, player)
-- FP controller: walk, sprint, jump/air jump, crouch, slide, mantle
-- Player under `res/actors/player/`
-- Autoload: `ControlSchemeManager`
-- Combat bridge + weapon placeholder; no real combat/enemies yet
-
----
-
-## Design lock (~1 week scope)
-
-**Flow:**
+## Playable flow (current)
 
 ```text
-[1] ENTRY YARD  — expand current test zone; big hole in the middle
+[1] ENTRY YARD     moon surface, central pit, signage
+        ↓ fall shaft (ledges, green mist)
+[2] WORM CAVE      Board Thrall / roadmap fauna (no jump puzzle)
         ↓
-[2] WORM CAVE   — short cave, worms; NO long jump puzzle
-        ↓
-[3] BOSS ROOM   — Hermen Hulst
+[3] BOSS ROOM      The Instrument (thoughtform) — Zulmak-shaped fight
 ```
 
-**In:** entry yard, central pit/shaft, worm cave (simple enemies/hazards), boss arena, comedy via text/signage.
+**Boss (The Instrument):**
 
-**Out:** full jump puzzle, multi-chamber hive, second mid-boss, classes/seasons/netcode, heavy VO/cinematics.
-
-**Boss:** 1 arena, 1–2 mechanics max, placeholder mesh OK.
-
----
-
-## First build step
-
-Blockout only:
-
-1. Expand moon yard as entry
-2. Dig big central hole / shaft
-3. Cave tunnel stub
-4. Boss room box
-5. Playable path: spawn → fall → walk → boss door (zero enemies)
-6. Prefer one level scene with three areas (evolve `test_arena` or new `pit_of_hulst.tscn`)
+1. **Exposed** — shoot boss (damage numbers)  
+2. **Shielded** — white mist, **Immune!** if shot  
+3. Kill **Board Thrall** → **Voltaic OKR** drops  
+4. **F** pick up OKR (one at a time) → walk into **Pillar of Engagement** to dunk  
+5. All pillars charged → **SHIELD DOWN** → next phase (×3 total DPS windows)
 
 ---
 
-## Blockout status (done)
+## Architecture map (keep this shape)
 
-- Main scene: `res/levels/pit_of_hulst.tscn` (wired in `project.godot`)
-- Legacy sandbox kept: `res/levels/test_arena.tscn`
-- Path: entry yard → central shaft fall → worm cave walk → boss room (no enemies)
-- Comedy via `Label3D` signage; Hermen = red box on gold dais
+```text
+res/
+  actors/
+    player/          # controller, HUD scene, weapon viewmodel
+    enemies/worm/    # thrall (also used as boss adds)
+    bosses/instrument/  # InstrumentBoss, pillars, OKRs
+    fx/              # DamageNumber floating text
+  levels/
+    pit_of_hulst.tscn   # main dungeon (single scene for now)
+    test_arena.tscn     # legacy sandbox
+  assets/            # textures, sky
+control_scheme_manager.gd   # autoload input schemes
+```
 
-## Next chat should
+### Important scripts
 
-1. Confirm cwd/workspace is `PitOfHulst` (do **not** edit Fate)
-2. Playtest blockout in editor; tweak scales/lighting if needed
-3. Next content (pick one): worm hazards/simple enemies, boss 1–2 mechanics, or more signage polish
-4. Optional: add `origin` remote when a PitOfHulst GitHub repo exists
+| Script | Responsibility |
+|--------|----------------|
+| `player_controller.gd` | Locomotion + combat input + health/heal + OKR carry |
+| `player_hud.gd` / `.tscn` | **All** player chrome (health bar, death, crosshair, status) |
+| `instrument_boss.gd` | Boss phases, shield, thrall spawn, OKR drops, pillars |
+| `voltaic_okr.gd` | Mote pickup (**F** / `interact`) |
+| `engagement_pillar.gd` | Dunk zone |
+| `worm.gd` | Thrall AI, contact damage, `died` signal |
+| `damage_number.gd` | World-space floating text |
+
+### Contracts (do not break casually)
+
+- **Player** is in group `player`; exposes `take_damage`, `heal`, `give_okr` / `has_okr` / `consume_okr` / `clear_okr`, `notify_kill`.
+- **Boss** is in group `boss`; thrall adds use group `board_thrall`.
+- **OKRs** are in group `voltaic_okr`.
+- **Damageable** combat targets implement `take_damage(amount, from)`.
+- **HUD**: controller talks only through `PlayerHud` API — do not re-scatter UI nodes under Player.
+
+---
+
+## Maintainability standards (project rules)
+
+1. **Fate isolation** — no edits under `Projects/Fate` for this game.  
+2. **No real likenesses** — abstract / parody only (The Instrument, not named execs).  
+3. **Single main scene is OK for now** — `pit_of_hulst.tscn` is large; split later if editing becomes painful (entry / shaft / cave / boss instances).  
+4. **Prefer small scenes for entities** — boss parts already split (`instrument_boss`, `voltaic_okr`, `engagement_pillar`, `worm`, `player_hud`).  
+5. **Magic numbers** live as `@export` on the owning script when tunable (heal CD, phase HP, thrall counts).  
+6. **Input** via named actions (`ult`, `interact`, move/*, etc.) + `ControlSchemeManager`; fallbacks in `player_controller._ensure_default_input_actions`.  
+7. **Docs** — update this file when flow, boss rules, or remotes change. README is the public blurb.  
+8. **Commits** — ship playable slices; don’t leave multi-day WIP unpushed to `origin`.  
+9. **Ignore** noisy `*.import` line-ending churn unless import settings actually changed.
+
+### Known debt (acceptable for short parody scope)
+
+| Item | Notes |
+|------|--------|
+| `player_controller.gd` ~600+ lines | Locomotion + combat + heal + OKR in one file; split only if it hurts |
+| `pit_of_hulst.tscn` ~780 lines | Monolithic level; CSG blockout is intentional |
+| `docs/hybrid_player_body_spec.md` | Fate-era; not active for this parody |
+| No automated tests | Manual playtest is the bar |
+| Soft thrall respawn during shield | Prevents soft-lock if OKRs/thrall depleted before pillars filled |
+
+---
+
+## Next work (when un-parking)
+
+Pick one:
+
+1. Iron-out: pillar positions, thrall spawn floors, shield readability  
+2. Win / dungeon-complete screen after Instrument dies  
+3. Comedy pass (signs, thrall names, death lines)  
+4. Optional Chamber-lite plate before boss door  
+5. Split level into instanced area scenes if CSG edits thrash git  
+
+---
+
+## Open in Godot
+
+1. Godot 4.6 → open this folder  
+2. Main scene: `res://res/levels/pit_of_hulst.tscn`  
+3. Or `open_project.bat`

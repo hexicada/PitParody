@@ -34,25 +34,27 @@ var slide_cooldown: float
 @onready var interaction_component: PlayerInteractionComponent = $HeadPivot/InteractionRayCast3D
 @onready var mantle_probe_lower: RayCast3D = $MantleProbeLower
 @onready var mantle_probe_upper: RayCast3D = $MantleProbeUpper
-@onready var state_label: Label = $UI/StateLabel
-@onready var hint_label: Label = $UI/HintLabel
-@onready var interaction_label: Label = $UI/InteractionLabel
 @onready var combat_bridge: PlayerCombatBridge = $CombatBridge
 @onready var weapon_anchor: WeaponAnchor = $HeadPivot/Camera3D/ViewModelRoot/UpperFP/WeaponAnchor
 @onready var camera_3d: Camera3D = $HeadPivot/Camera3D
-@onready var health_label: Label = $UI/HealthLabel
-@onready var death_overlay: Control = $UI/DeathOverlay
-@onready var death_title: Label = $UI/DeathOverlay/Center/VBox/DeathTitle
-@onready var death_killer: Label = $UI/DeathOverlay/Center/VBox/DeathKiller
-@onready var death_flavor: Label = $UI/DeathOverlay/Center/VBox/DeathFlavor
-@onready var hit_marker: Control = $UI/HitMarker
-@onready var weapon_hud: Label = $UI/WeaponHud
+@onready var hud: PlayerHud = $PlayerHud
 
-@export var max_health: float = 100.0
+@export var max_health: float = 300.0
 @export var fire_damage: float = 25.0
 @export var fire_range: float = 55.0
 @export var fire_cooldown: float = 0.14
 @export var death_hold_time: float = 3.6
+@export_group("Healing")
+@export var heal_ability_amount: float = 90.0
+@export var heal_ability_cooldown: float = 14.0
+@export var kill_heal_amount: float = 20.0
+@export var ooc_regen_delay: float = 3.5
+@export var ooc_regen_per_second: float = 12.0
+@export_group("Low Health FX")
+@export var low_health_start_ratio: float = 0.35
+@export var low_health_full_ratio: float = 0.12
+
+const _DamageNumber := preload("res://res/actors/fx/damage_number.gd")
 
 var _gravity := 9.8
 var _state := PlayerLocomotionState.Value.STANDING
@@ -66,14 +68,16 @@ var _mantle_time_left := 0.0
 var _mantle_start_position := Vector3.ZERO
 var _mantle_target_position := Vector3.ZERO
 var _air_jumps_left := 0
-var health: float = 100.0
+var health: float = 300.0
 var _spawn_position: Vector3
 var _spawn_yaw: float = 0.0
 var _fire_cd: float = 0.0
 var _is_dead: bool = false
 var _death_timer: float = 0.0
-var _hit_marker_timer: float = 0.0
 var _camera_punch: float = 0.0
+var _holding_okr: bool = false
+var _heal_cd: float = 0.0
+var _time_since_damage: float = 999.0
 
 
 func _ready() -> void:
@@ -90,13 +94,13 @@ func _ready() -> void:
 	health = max_health
 	_spawn_position = global_position
 	_spawn_yaw = rotation.y
-	if death_overlay:
-		death_overlay.visible = false
-	if hit_marker:
-		hit_marker.modulate.a = 0.0
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
-	hint_label.text = "WASD move | Mouse look | Shift sprint | Space jump | Ctrl crouch/slide | LMB Feedback Loop | Esc mouse"
+	if hud:
+		hud.set_hint("WASD | Mouse | Shift sprint | Space jump | Ctrl crouch | LMB shoot | Q heal | F pick up OKR | dunk on pillars | Esc")
 	combat_bridge.update_from_locomotion_state(_state)
+	_update_okr_hud()
+	_update_heal_hud()
+	_update_health_ui()
 	_update_debug_label()
 
 
@@ -152,6 +156,16 @@ func _input(event: InputEvent) -> void:
 	if Input.mouse_mode != Input.MOUSE_MODE_CAPTURED:
 		return
 
+	if event.is_action_pressed("ult") or (event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_Q):
+		_try_heal_ability()
+		get_viewport().set_input_as_handled()
+		return
+
+	# Interact is also read by nearby Voltaic OKRs; keep binding hot.
+	if event.is_action_pressed("interact"):
+		get_viewport().set_input_as_handled()
+		return
+
 	if event is InputEventMouseMotion:
 		camera_controller.handle_input(event, self)
 		get_viewport().set_input_as_handled()
@@ -161,10 +175,92 @@ func take_damage(amount: float, from: Node = null) -> void:
 	if _is_dead or health <= 0.0:
 		return
 	health = maxf(health - amount, 0.0)
+	_time_since_damage = 0.0
 	_camera_punch = minf(_camera_punch + 0.08, 0.25)
 	_update_debug_label()
 	if health <= 0.0:
 		_begin_death(from)
+
+
+func heal(amount: float, label: String = "HEAL", show_popup: bool = true) -> float:
+	if _is_dead or amount <= 0.0 or health >= max_health:
+		return 0.0
+	var before := health
+	health = minf(health + amount, max_health)
+	var gained := health - before
+	if gained <= 0.0:
+		return 0.0
+	if show_popup and gained >= 0.5:
+		_DamageNumber.spawn(
+			self,
+			global_position + Vector3(0, 1.8, 0),
+			"+%d" % int(round(gained)),
+			Color(0.45, 1.0, 0.55),
+			42
+		)
+		_set_weapon_hud("%s  ·  +%d HP" % [label, int(round(gained))])
+	_update_debug_label()
+	return gained
+
+
+func notify_kill(_victim: Node = null) -> void:
+	if _is_dead or kill_heal_amount <= 0.0:
+		return
+	heal(kill_heal_amount, "Kill heal", true)
+
+
+func _try_heal_ability() -> void:
+	if _is_dead:
+		return
+	if _heal_cd > 0.0:
+		_set_weapon_hud("Restorative Sync on cooldown (%.1fs)" % _heal_cd)
+		return
+	if health >= max_health:
+		_set_weapon_hud("Already at full Light / HP")
+		return
+	_heal_cd = heal_ability_cooldown
+	heal(heal_ability_amount, "Restorative Sync", true)
+	_update_heal_hud()
+
+
+func has_okr() -> bool:
+	return _holding_okr
+
+
+func give_okr() -> bool:
+	if _is_dead:
+		return false
+	if _holding_okr:
+		_set_weapon_hud("Already carrying a Voltaic OKR (one at a time)")
+		return false
+	_holding_okr = true
+	_update_okr_hud()
+	_set_weapon_hud("Voltaic OKR acquired — dunk on a Pillar of Engagement")
+	return true
+
+
+func consume_okr() -> bool:
+	if not _holding_okr:
+		return false
+	_holding_okr = false
+	_update_okr_hud()
+	_set_weapon_hud("OKR banked")
+	return true
+
+
+func clear_okr() -> void:
+	_holding_okr = false
+	_update_okr_hud()
+
+
+func _update_okr_hud() -> void:
+	if hud:
+		hud.set_okr_carrying(_holding_okr)
+
+
+func _update_heal_hud() -> void:
+	if hud:
+		hud.set_heal_status(_heal_cd <= 0.0, _heal_cd)
 
 
 func _try_fire() -> void:
@@ -214,32 +310,31 @@ func _begin_death(from: Node = null) -> void:
 	_is_dead = true
 	_death_timer = death_hold_time
 	velocity = Vector3.ZERO
-	if death_overlay:
-		death_overlay.visible = true
-	if death_title:
-		death_title.text = "You are dead."
-	if death_killer:
-		death_killer.text = "Killed by\n%s" % _killer_name(from)
-	if death_flavor:
-		death_flavor.text = _random_death_flavor()
+	if hud:
+		hud.show_death("Killed by\n%s" % _killer_name(from), _random_death_flavor())
 	_update_debug_label()
 
 
 func _finish_respawn() -> void:
 	_is_dead = false
 	_death_timer = 0.0
-	if death_overlay:
-		death_overlay.visible = false
+	if hud:
+		hud.hide_death()
 	global_position = _spawn_position
 	rotation.y = _spawn_yaw
 	velocity = Vector3.ZERO
 	health = max_health
+	_holding_okr = false
+	_heal_cd = 0.0
+	_time_since_damage = 999.0
 	_state = PlayerLocomotionState.Value.STANDING
 	_is_crouching = false
 	_crouch_alpha = 0.0
 	_apply_crouch_pose(0.0)
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	_set_weapon_hud("The Feedback Loop  ·  re-engaged")
+	_update_okr_hud()
+	_update_heal_hud()
 	_update_debug_label()
 
 
@@ -268,23 +363,27 @@ func _random_death_flavor() -> String:
 
 
 func _show_hit_marker() -> void:
-	_hit_marker_timer = 0.12
-	if hit_marker:
-		hit_marker.modulate.a = 1.0
+	if hud:
+		hud.flash_hit_marker(0.12)
 
 
 func _set_weapon_hud(text: String) -> void:
-	if weapon_hud:
-		weapon_hud.text = text
+	if hud:
+		hud.set_weapon_line(text)
 
 
 func _physics_process(delta: float) -> void:
 	if _fire_cd > 0.0:
 		_fire_cd = maxf(_fire_cd - delta, 0.0)
-	if _hit_marker_timer > 0.0:
-		_hit_marker_timer = maxf(_hit_marker_timer - delta, 0.0)
-		if hit_marker:
-			hit_marker.modulate.a = clampf(_hit_marker_timer / 0.12, 0.0, 1.0)
+	if _heal_cd > 0.0:
+		_heal_cd = maxf(_heal_cd - delta, 0.0)
+		_update_heal_hud()
+	else:
+		_update_heal_hud()
+	_time_since_damage += delta
+	if not _is_dead and health < max_health and _time_since_damage >= ooc_regen_delay:
+		heal(ooc_regen_per_second * delta, "Out-of-combat regen", false)
+	_update_low_health_fx(delta)
 	if _camera_punch > 0.0:
 		_camera_punch = maxf(_camera_punch - delta * 0.8, 0.0)
 		if camera_3d:
@@ -294,8 +393,8 @@ func _physics_process(delta: float) -> void:
 
 	if _is_dead:
 		_death_timer -= delta
-		if death_flavor and _death_timer < 1.2:
-			death_flavor.text = "Respawning…"
+		if _death_timer < 1.2 and hud:
+			hud.set_death_flavor("Respawning…")
 		if _death_timer <= 0.0:
 			_finish_respawn()
 		_update_debug_label()
@@ -684,19 +783,36 @@ func _horizontal_speed() -> float:
 func _update_debug_label() -> void:
 	var state_name := PlayerLocomotionState.name_for(_state)
 	var weapon_ready := combat_bridge.readiness_name() if combat_bridge else "-"
-	state_label.text = "State: %s | Speed: %.2f | Weapon: %s" % [
-		state_name,
-		_horizontal_speed(),
-		weapon_ready
-	]
-	if health_label:
-		if _is_dead:
-			health_label.text = "HP: 0 / %.0f" % max_health
-		else:
-			health_label.text = "HP: %.0f / %.0f" % [health, max_health]
-	if weapon_hud and weapon_hud.text == "":
-		weapon_hud.text = "The Feedback Loop  ·  ready"
-	interaction_label.text = interaction_component.get_interaction_hint()
+	if hud:
+		hud.set_state_line("State: %s | Speed: %.2f | Weapon: %s" % [
+			state_name,
+			_horizontal_speed(),
+			weapon_ready
+		])
+		hud.set_interaction(interaction_component.get_interaction_hint())
+	_update_health_ui()
+
+
+func _update_health_ui() -> void:
+	if hud:
+		hud.set_health(health, max_health, _is_dead)
+
+
+func _update_low_health_fx(_delta: float) -> void:
+	if hud == null:
+		return
+	if _is_dead:
+		hud.set_low_health_intensity(0.0)
+		return
+	var ratio := 0.0 if max_health <= 0.0 else health / max_health
+	var start_r := low_health_start_ratio
+	var full_r := low_health_full_ratio
+	var danger := 0.0
+	if ratio <= start_r:
+		danger = clampf((start_r - ratio) / maxf(start_r - full_r, 0.001), 0.0, 1.0)
+	if danger > 0.55:
+		danger = clampf(danger + sin(Time.get_ticks_msec() * 0.008) * 0.08, 0.0, 1.0)
+	hud.set_low_health_intensity(danger * 0.9)
 
 
 func _ensure_default_input_actions() -> void:
@@ -707,6 +823,8 @@ func _ensure_default_input_actions() -> void:
 	_ensure_action_with_key("jump", KEY_SPACE)
 	_ensure_action_with_key("sprint", KEY_SHIFT)
 	_ensure_action_with_key("crouch", KEY_CTRL)
+	_ensure_action_with_key("ult", KEY_Q)
+	_ensure_action_with_key("interact", KEY_F)
 
 
 func _ensure_action_with_key(action_name: StringName, keycode: Key) -> void:

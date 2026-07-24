@@ -3,6 +3,8 @@ class_name CaveWorm
 
 ## Simple cave worm: patrols, lunges if the player is near, damages on touch, dies to hitscan.
 
+signal died(world_pos: Vector3)
+
 const _DamageNumber := preload("res://res/actors/fx/damage_number.gd")
 
 @export var display_name: String = "Roadmap Worm"
@@ -114,7 +116,7 @@ func _physics_process(delta: float) -> void:
 	_try_contact_damage(player, dist, to_player)
 
 
-func take_damage(amount: float, _from: Node = null) -> void:
+func take_damage(amount: float, from: Node = null) -> void:
 	if _dead:
 		return
 	health -= amount
@@ -128,6 +130,8 @@ func take_damage(amount: float, _from: Node = null) -> void:
 		40
 	)
 	if health <= 0.0:
+		if from != null and from.is_in_group("player") and from.has_method("notify_kill"):
+			from.call("notify_kill", self)
 		_die()
 
 
@@ -221,6 +225,11 @@ func _die() -> void:
 		_damage_area.monitoring = false
 	if _name_label:
 		_name_label.text = "%s\n(deprioritized)" % display_name
+	var death_pos := global_position
+	died.emit(death_pos)
+	# Backup notify so boss always gets a drop even if signal connect failed.
+	if is_in_group("board_thrall"):
+		get_tree().call_group("boss", "notify_thrall_killed", death_pos)
 	# Collapse into the floor comically, then free
 	var tw := create_tween()
 	tw.tween_property(self, "scale", Vector3(1.2, 0.15, 1.2), 0.35)
