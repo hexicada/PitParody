@@ -1,0 +1,313 @@
+[gd_scene load_steps=14 format=3]
+
+[ext_resource type="Script" path="res://res/actors/enemies/twitter_knight/twitter_knight.gd" id="1_knight"]
+
+[sub_resource type="CapsuleShape3D" id="Shape_body"]
+radius = 0.55
+height = 2.1
+
+[sub_resource type="StandardMaterial3D" id="Mat_chitin"]
+albedo_color = Color(0.72, 0.68, 0.48, 1)
+roughness = 0.72
+metallic = 0.08
+emission_enabled = true
+emission = Color(0.35, 0.4, 0.15, 1)
+emission_energy_multiplier = 0.08
+
+[sub_resource type="StandardMaterial3D" id="Mat_chitin_dark"]
+albedo_color = Color(0.42, 0.4, 0.28, 1)
+roughness = 0.82
+metallic = 0.05
+
+[sub_resource type="StandardMaterial3D" id="Mat_bone"]
+albedo_color = Color(0.82, 0.78, 0.62, 1)
+roughness = 0.65
+
+[sub_resource type="StandardMaterial3D" id="Mat_eye"]
+albedo_color = Color(0.35, 1, 0.25, 1)
+roughness = 0.2
+emission_enabled = true
+emission = Color(0.25, 1, 0.15, 1)
+emission_energy_multiplier = 3.5
+shading_mode = 0
+
+[sub_resource type="StandardMaterial3D" id="Mat_vein"]
+albedo_color = Color(0.25, 0.75, 0.2, 1)
+roughness = 0.4
+emission_enabled = true
+emission = Color(0.15, 0.85, 0.12, 1)
+emission_energy_multiplier = 1.4
+
+[sub_resource type="StandardMaterial3D" id="Mat_cleaver"]
+albedo_color = Color(0.55, 0.55, 0.5, 1)
+roughness = 0.35
+metallic = 0.45
+emission_enabled = true
+emission = Color(0.2, 0.55, 0.18, 1)
+emission_energy_multiplier = 0.35
+
+[sub_resource type="StandardMaterial3D" id="Mat_cape"]
+albedo_color = Color(0.18, 0.2, 0.12, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="Mesh_box"]
+
+[sub_resource type="SphereMesh" id="Mesh_sphere"]
+radius = 0.5
+height = 1.0
+radial_segments = 14
+rings = 10
+
+[sub_resource type="CylinderMesh" id="Mesh_cyl"]
+top_radius = 0.5
+bottom_radius = 0.5
+height = 1.0
+radial_segments = 12
+
+[sub_resource type="PrismMesh" id="Mesh_spike"]
+size = Vector3(0.35, 0.7, 0.35)
+
+[node name="TwitterCommentKnight" type="CharacterBody3D"]
+collision_layer = 2
+collision_mask = 1
+floor_snap_length = 0.25
+script = ExtResource("1_knight")
+display_name = "Hive Comment Knight"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.15, 0)
+shape = SubResource("Shape_body")
+
+[node name="Body" type="Node3D" parent="."]
+
+; --- Legs (digitigrade-ish bulk) ---
+[node name="ThighL" type="MeshInstance3D" parent="Body"]
+transform = Transform3D(0.38, 0, 0, 0, 0.55, 0, 0, 0, 0.42, -0.28, 0.55, 0.05)
+material_override = SubResource("Mat_chitin")
+mesh = SubResource("Mesh_box")
+
+[node name="ThighR" type="MeshInstance3D" parent="Body"]
+transform = Transform3D(0.38, 0, 0, 0, 0.55, 0, 0, 0, 0.42, 0.28, 0.55, 0.05)
+material_override = SubResource("Mat_chitin")
+mesh = SubResource("Mesh_box")
+
+[node name="ShinL" type="MeshInstance3D" parent="Body"]
+transform = Transform3D(0.32, 0, 0, 0, 0.5, 0, 0, 0, 0.38, -0.28, 0.22, 0.12)
+material_override = SubResource("Mat_chitin_dark")
+mesh = SubResource("Mesh_box")
+
+[node name="ShinR" type="MeshInstance3D" parent="Body"]
+transform = Transform3D(0.32, 0, 0, 0, 0.5, 0, 0, 0, 0.38, 0.28, 0.22, 0.12)
+material_override = SubResource("Mat_chitin_dark")
+mesh = SubResource("Mesh_box")
+
+[node name="FootL" type="MeshInstance3D" parent="Body"]
+transform = Transform3D(0.35, 0, 0, 0, 0.18, 0, 0, 0, 0.55, -0.28, 0.08, 0.28)
+material_override = SubResource("Mat_bone")
+mesh = SubResource("Mesh_box")
+
+[node name="FootR" type="MeshInstance3D" parent="Body"]
+transform = Transform3D(0.35, 0, 0, 0, 0.18, 0, 0, 0, 0.55, 0.28, 0.08, 0.28)
+material_override = SubResource("Mat_bone")
+mesh = SubResource("Mesh_box")
+
+[node name="KneeL" type="MeshInstance3D" parent="Body"]
+transform = Transform3D(0.28, 0, 0, 0, 0.28, 0, 0, 0, 0.28, -0.28, 0.42, 0.2)
+material_override = SubResource("Mat_bone")
+mesh = SubResource("Mesh_sphere")
+
+[node name="KneeR" type="MeshInstance3D" parent="Body"]
+transform = Transform3D(0.28, 0, 0, 0, 0.28, 0, 0, 0, 0.28, 0.28, 0.42, 0.2)
+material_override = SubResource("Mat_bone")
+mesh = SubResource("Mesh_sphere")
+
+; --- Torso / ribbed chitin ---
+[node name="Pelvis" type="MeshInstance3D" parent="Body"]
+transform = Transform3D(0.85, 0, 0, 0, 0.45, 0, 0, 0, 0.55, 0, 0.95, 0)
+material_override = SubResource("Mat_chitin_dark")
+mesh = SubResource("Mesh_box")
+
+[node name="Torso" type="MeshInstance3D" parent="Body"]
+transform = Transform3D(1.05, 0, 0, 0, 1.15, 0, 0, 0, 0.7, 0, 1.55, 0)
+material_override = SubResource("Mat_chitin")
+mesh = SubResource("Mesh_box")
+
+[node name="ChestPlate" type="MeshInstance3D" parent="Body"]
+transform = Transform3D(0.9, 0, 0, 0, 0.7, 0, 0, 0, 0.35, 0, 1.65, 0.28)
+material_override = SubResource("Mat_bone")
+mesh = SubResource("Mesh_box")
+
+[node name="RibGlow" type="MeshInstance3D" parent="Body"]
+transform = Transform3D(0.55, 0, 0, 0, 0.08, 0, 0, 0, 0.12, 0, 1.55, 0.42)
+material_override = SubResource("Mat_vein")
+cast_shadow = 0
+mesh = SubResource("Mesh_box")
+
+[node name="RibGlow2" type="MeshInstance3D" parent="Body"]
+transform = Transform3D(0.45, 0, 0, 0, 0.08, 0, 0, 0, 0.12, 0, 1.4, 0.42)
+material_override = SubResource("Mat_vein")
+cast_shadow = 0
+mesh = SubResource("Mesh_box")
+
+; --- Cape / membrane ---
+[node name="Cape" type="MeshInstance3D" parent="Body"]
+transform = Transform3D(1.1, 0, 0, 0, 1.4, 0, 0, 0, 0.12, 0, 1.4, -0.45)
+material_override = SubResource("Mat_cape")
+mesh = SubResource("Mesh_box")
+
+; --- Massive spiked shoulders ---
+[node name="ShoulderL" type="MeshInstance3D" parent="Body"]
+transform = Transform3D(0.7, 0, 0, 0, 0.55, 0, 0, 0, 0.55, -0.75, 2.05, 0)
+material_override = SubResource("Mat_chitin")
+mesh = SubResource("Mesh_box")
+
+[node name="ShoulderR" type="MeshInstance3D" parent="Body"]
+transform = Transform3D(0.7, 0, 0, 0, 0.55, 0, 0, 0, 0.55, 0.75, 2.05, 0)
+material_override = SubResource("Mat_chitin")
+mesh = SubResource("Mesh_box")
+
+[node name="SpikeL1" type="MeshInstance3D" parent="Body"]
+transform = Transform3D(0.8, 0.4, 0, -0.4, 0.8, 0, 0, 0, 1, -1.0, 2.35, 0)
+material_override = SubResource("Mat_bone")
+mesh = SubResource("Mesh_spike")
+
+[node name="SpikeL2" type="MeshInstance3D" parent="Body"]
+transform = Transform3D(0.7, 0.2, 0, -0.2, 0.7, 0, 0, 0, 0.9, -0.95, 2.15, 0.25)
+material_override = SubResource("Mat_bone")
+mesh = SubResource("Mesh_spike")
+
+[node name="SpikeR1" type="MeshInstance3D" parent="Body"]
+transform = Transform3D(0.8, -0.4, 0, 0.4, 0.8, 0, 0, 0, 1, 1.0, 2.35, 0)
+material_override = SubResource("Mat_bone")
+mesh = SubResource("Mesh_spike")
+
+[node name="SpikeR2" type="MeshInstance3D" parent="Body"]
+transform = Transform3D(0.7, -0.2, 0, 0.2, 0.7, 0, 0, 0, 0.9, 0.95, 2.15, 0.25)
+material_override = SubResource("Mat_bone")
+mesh = SubResource("Mesh_spike")
+
+; --- Arms ---
+[node name="ArmL" type="MeshInstance3D" parent="Body"]
+transform = Transform3D(0.32, 0, 0, 0, 0.7, 0, 0, 0, 0.32, -0.85, 1.45, 0.1)
+material_override = SubResource("Mat_chitin")
+mesh = SubResource("Mesh_box")
+
+[node name="ArmR" type="MeshInstance3D" parent="Body"]
+transform = Transform3D(0.32, 0, 0, 0, 0.7, 0, 0, 0, 0.32, 0.85, 1.45, 0.1)
+material_override = SubResource("Mat_chitin")
+mesh = SubResource("Mesh_box")
+
+[node name="ForearmL" type="MeshInstance3D" parent="Body"]
+transform = Transform3D(0.35, 0, 0, 0, 0.55, 0, 0, 0, 0.4, -0.9, 0.95, 0.25)
+material_override = SubResource("Mat_chitin_dark")
+mesh = SubResource("Mesh_box")
+
+[node name="ForearmR" type="MeshInstance3D" parent="Body"]
+transform = Transform3D(0.35, 0, 0, 0, 0.55, 0, 0, 0, 0.4, 0.9, 0.95, 0.25)
+material_override = SubResource("Mat_chitin_dark")
+mesh = SubResource("Mesh_box")
+
+; --- Head: elongated Hive skull, crest spikes, glowing eyes ---
+[node name="Head" type="MeshInstance3D" parent="Body"]
+transform = Transform3D(0.85, 0, 0, 0, 0.95, 0, 0, 0, 1.05, 0, 2.35, 0.1)
+material_override = SubResource("Mat_chitin")
+mesh = SubResource("Mesh_sphere")
+
+[node name="Jaw" type="MeshInstance3D" parent="Body"]
+transform = Transform3D(0.55, 0, 0, 0, 0.28, 0, 0, 0, 0.5, 0, 2.05, 0.35)
+material_override = SubResource("Mat_chitin_dark")
+mesh = SubResource("Mesh_box")
+
+[node name="Crest" type="MeshInstance3D" parent="Body"]
+transform = Transform3D(0.15, 0, 0, 0, 0.55, 0, 0, 0, 0.55, 0, 2.85, -0.05)
+material_override = SubResource("Mat_bone")
+mesh = SubResource("Mesh_box")
+
+[node name="HornL" type="MeshInstance3D" parent="Body"]
+transform = Transform3D(0.5, 0.5, 0, -0.5, 0.5, 0, 0, 0, 0.7, -0.35, 2.75, 0)
+material_override = SubResource("Mat_bone")
+mesh = SubResource("Mesh_spike")
+
+[node name="HornR" type="MeshInstance3D" parent="Body"]
+transform = Transform3D(0.5, -0.5, 0, 0.5, 0.5, 0, 0, 0, 0.7, 0.35, 2.75, 0)
+material_override = SubResource("Mat_bone")
+mesh = SubResource("Mesh_spike")
+
+[node name="HornTop" type="MeshInstance3D" parent="Body"]
+transform = Transform3D(0.45, 0, 0, 0, 0.75, 0, 0, 0, 0.45, 0, 2.95, -0.1)
+material_override = SubResource("Mat_bone")
+mesh = SubResource("Mesh_spike")
+
+[node name="EyeL" type="MeshInstance3D" parent="Body"]
+transform = Transform3D(0.12, 0, 0, 0, 0.12, 0, 0, 0, 0.12, -0.18, 2.4, 0.52)
+material_override = SubResource("Mat_eye")
+cast_shadow = 0
+mesh = SubResource("Mesh_sphere")
+
+[node name="EyeR" type="MeshInstance3D" parent="Body"]
+transform = Transform3D(0.12, 0, 0, 0, 0.12, 0, 0, 0, 0.12, 0.18, 2.4, 0.52)
+material_override = SubResource("Mat_eye")
+cast_shadow = 0
+mesh = SubResource("Mesh_sphere")
+
+[node name="EyeC" type="MeshInstance3D" parent="Body"]
+transform = Transform3D(0.09, 0, 0, 0, 0.09, 0, 0, 0, 0.09, 0, 2.52, 0.55)
+material_override = SubResource("Mat_eye")
+cast_shadow = 0
+mesh = SubResource("Mesh_sphere")
+
+[node name="EyeLight" type="OmniLight3D" parent="Body"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.4, 0.6)
+light_color = Color(0.4, 1, 0.25, 1)
+light_energy = 1.8
+omni_range = 4.0
+
+; --- Cleaver sword (Hive knight blade, not medieval longsword) ---
+[node name="SwordPivot" type="Node3D" parent="Body"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.95, 1.1, 0.35)
+
+[node name="Hilt" type="MeshInstance3D" parent="Body/SwordPivot"]
+transform = Transform3D(0.18, 0, 0, 0, 0.45, 0, 0, 0, 0.18, 0, -0.1, 0)
+material_override = SubResource("Mat_bone")
+mesh = SubResource("Mesh_cyl")
+
+[node name="Guard" type="MeshInstance3D" parent="Body/SwordPivot"]
+transform = Transform3D(0.7, 0, 0, 0, 0.15, 0, 0, 0, 0.25, 0, 0.15, 0)
+material_override = SubResource("Mat_chitin_dark")
+mesh = SubResource("Mesh_box")
+
+[node name="Blade" type="MeshInstance3D" parent="Body/SwordPivot"]
+transform = Transform3D(0.22, 0, 0, 0, 1.55, 0, 0, 0, 0.08, 0, 0.95, 0)
+material_override = SubResource("Mat_cleaver")
+mesh = SubResource("Mesh_box")
+
+[node name="BladeTip" type="MeshInstance3D" parent="Body/SwordPivot"]
+transform = Transform3D(0.18, 0, 0, 0, 0.45, 0, 0, 0, 0.06, 0, 1.85, 0)
+material_override = SubResource("Mat_cleaver")
+mesh = SubResource("Mesh_spike")
+
+[node name="BladeGlow" type="MeshInstance3D" parent="Body/SwordPivot"]
+transform = Transform3D(0.08, 0, 0, 0, 1.2, 0, 0, 0, 0.04, 0.12, 0.9, 0)
+material_override = SubResource("Mat_vein")
+cast_shadow = 0
+mesh = SubResource("Mesh_box")
+
+[node name="NameLabel" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.2, 0)
+billboard = 1
+text = "Hive Comment Knight"
+font_size = 26
+modulate = Color(0.55, 1, 0.4, 1)
+outline_size = 6
+horizontal_alignment = 1
+
+[node name="QuoteBubble" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.7, 0)
+billboard = 1
+text = "\"...\""
+font_size = 22
+modulate = Color(0.85, 1, 0.7, 1)
+outline_size = 5
+horizontal_alignment = 1
+width = 420.0
+autowrap_mode = 2

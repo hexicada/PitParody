@@ -1,7 +1,7 @@
 extends StaticBody3D
 class_name InstrumentBoss
 
-## The Instrument — live-service thoughtform. Zulmak-shaped: DPS → immune → thrall → OKR dunks → DPS.
+## The Instrument — live-service thoughtform. Zulmak-shaped: DPS → immune → worms → OKR dunks → DPS.
 
 enum FightState {
 	VULNERABLE,
@@ -17,11 +17,11 @@ const _DamageNumber := preload("res://res/actors/fx/damage_number.gd")
 @export var bob_speed: float = 1.5
 @export var face_player: bool = true
 @export var turn_speed: float = 2.0
-@export var thrall_scene: PackedScene
+@export var worm_scene: PackedScene
 @export var okr_scene: PackedScene
 @export var pillar_scene: PackedScene
-@export var shield_wave_1_thralls: int = 3
-@export var shield_wave_2_thralls: int = 5
+@export var shield_wave_1_worms: int = 3
+@export var shield_wave_2_worms: int = 5
 @export var wave_1_pillars: int = 2
 @export var wave_2_pillars: int = 3
 
@@ -52,8 +52,8 @@ func _ready() -> void:
 	add_to_group("enemy")
 	add_to_group("damageable")
 	add_to_group("boss")
-	if thrall_scene == null:
-		thrall_scene = load("res://res/actors/enemies/worm/worm.tscn") as PackedScene
+	if worm_scene == null:
+		worm_scene = load("res://res/actors/enemies/worm/worm.tscn") as PackedScene
 	if okr_scene == null:
 		okr_scene = load("res://res/actors/bosses/instrument/voltaic_okr.tscn") as PackedScene
 	if pillar_scene == null:
@@ -95,7 +95,7 @@ func _physics_process(delta: float) -> void:
 
 	if state == FightState.SHIELDED:
 		_prune_adds()
-		_ensure_thrall_for_remaining_dunks()
+		_ensure_worms_for_remaining_dunks()
 		_update_status()
 
 
@@ -164,10 +164,10 @@ func _enter_shield() -> void:
 	_pillars_needed = wave_1_pillars if phase == 1 else wave_2_pillars
 	_pillars_charged = 0
 	_spawn_pillars(_pillars_needed)
-	var thrall_n := shield_wave_1_thralls if phase == 1 else shield_wave_2_thralls
-	_spawn_thralls(thrall_n)
+	var worm_n := shield_wave_1_worms if phase == 1 else shield_wave_2_worms
+	_spawn_worms(worm_n)
 	if _taunt_label:
-		_taunt_label.text = "SHIELDED — kill thrall, dunk Voltaic OKRs"
+		_taunt_label.text = "SHIELDED — kill worms, dunk Voltaic OKRs"
 	_DamageNumber.spawn(
 		self,
 		global_position + Vector3(0, 3.0, 0),
@@ -243,8 +243,8 @@ func _pillar_slot_offsets(count: int) -> Array[Vector3]:
 	] as Array[Vector3]
 
 
-func _spawn_thralls(count: int) -> void:
-	if thrall_scene == null or count <= 0:
+func _spawn_worms(count: int) -> void:
+	if worm_scene == null or count <= 0:
 		return
 	var ring := [
 		Vector3(-5.0, -0.9, 3.0),
@@ -256,29 +256,29 @@ func _spawn_thralls(count: int) -> void:
 	]
 	var start_i := _adds.size()
 	for i in count:
-		var thrall := thrall_scene.instantiate() as Node3D
-		if thrall == null:
+		var worm := worm_scene.instantiate() as Node3D
+		if worm == null:
 			continue
 		var parent: Node = get_tree().current_scene
 		if parent == null:
 			parent = get_parent()
-		parent.add_child(thrall)
-		thrall.global_position = global_position + ring[(start_i + i) % ring.size()]
-		if "display_name" in thrall:
-			thrall.set("display_name", _thrall_name(start_i + i))
-		if "patrol_half_extent" in thrall:
-			thrall.set("patrol_half_extent", 2.0)
-		if thrall.has_signal("died"):
-			thrall.died.connect(_on_thrall_died)
-		thrall.add_to_group("board_thrall")
-		_adds.append(thrall)
+		parent.add_child(worm)
+		worm.global_position = global_position + ring[(start_i + i) % ring.size()]
+		if "display_name" in worm:
+			worm.set("display_name", _boss_worm_name(start_i + i))
+		if "patrol_half_extent" in worm:
+			worm.set("patrol_half_extent", 2.0)
+		if worm.has_signal("died"):
+			worm.died.connect(_on_boss_worm_died)
+		worm.add_to_group("board_worm")
+		_adds.append(worm)
 
 
-func _on_thrall_died(world_pos: Vector3) -> void:
-	notify_thrall_killed(world_pos)
+func _on_boss_worm_died(world_pos: Vector3) -> void:
+	notify_worm_killed(world_pos)
 
 
-func notify_thrall_killed(world_pos: Vector3) -> void:
+func notify_worm_killed(world_pos: Vector3) -> void:
 	if state != FightState.SHIELDED:
 		return
 	# Dedupe if both signal and call_group fire for the same kill.
@@ -332,8 +332,8 @@ func _remaining_dunks() -> int:
 	return maxi(_pillars_needed - _pillars_charged, 0)
 
 
-func _ensure_thrall_for_remaining_dunks() -> void:
-	# Soft-lock prevention: if still need dunks but no thrall/orbs in play, respawn thrall.
+func _ensure_worms_for_remaining_dunks() -> void:
+	# Soft-lock prevention: if still need dunks but no worms/orbs in play, respawn worms.
 	var need := _remaining_dunks()
 	if need <= 0:
 		return
@@ -341,14 +341,14 @@ func _ensure_thrall_for_remaining_dunks() -> void:
 	if supply >= need:
 		return
 	var missing := need - supply
-	_spawn_thralls(missing)
+	_spawn_worms(missing)
 	if _taunt_label:
-		_taunt_label.text = "More thrall join the board. Harvest OKRs."
+		_taunt_label.text = "More worms join the board. Harvest OKRs."
 
 
-func _thrall_name(i: int) -> String:
+func _boss_worm_name(i: int) -> String:
 	var names := [
-		"Board Thrall",
+		"Board Worm",
 		"Proxy Vote",
 		"Quorum Grub",
 		"Dilution Worm",
@@ -412,7 +412,7 @@ func _update_status() -> void:
 	var hp_pct := int(round((health / maxf(max_health, 1.0)) * 100.0))
 	match state:
 		FightState.SHIELDED:
-			_status_label.text = "Phase %d/3  ·  SHIELDED\nPillars %d/%d  ·  Thrall %d\nHP %d%% (locked)" % [
+			_status_label.text = "Phase %d/3  ·  SHIELDED\nPillars %d/%d  ·  Worms %d\nHP %d%% (locked)" % [
 				phase, _pillars_charged, _pillars_needed, _adds.size(), hp_pct
 			]
 			_status_label.modulate = Color(0.75, 0.9, 1.0)

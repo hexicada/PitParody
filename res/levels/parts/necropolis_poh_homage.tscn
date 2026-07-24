@@ -1,0 +1,1344 @@
+[gd_scene load_steps=15 format=3]
+
+[ext_resource type="PackedScene" path="res://res/actors/enemies/twitter_knight/twitter_knight.tscn" id="1_knight"]
+
+; Hive palette from Pit of Heresy refs: rust-red stone, bone pillars, sickly green
+[sub_resource type="StandardMaterial3D" id="Mat_rock"]
+albedo_color = Color(0.38, 0.14, 0.12, 1)
+roughness = 0.92
+emission_enabled = true
+emission = Color(0.18, 0.04, 0.03, 1)
+emission_energy_multiplier = 0.08
+
+[sub_resource type="StandardMaterial3D" id="Mat_floor"]
+albedo_color = Color(0.28, 0.12, 0.1, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="Mat_hive"]
+albedo_color = Color(0.48, 0.16, 0.14, 1)
+roughness = 0.8
+emission_enabled = true
+emission = Color(0.35, 0.06, 0.05, 1)
+emission_energy_multiplier = 0.22
+
+[sub_resource type="StandardMaterial3D" id="Mat_hive_dark"]
+albedo_color = Color(0.22, 0.08, 0.08, 1)
+roughness = 0.88
+
+[sub_resource type="StandardMaterial3D" id="Mat_bone"]
+albedo_color = Color(0.72, 0.68, 0.55, 1)
+roughness = 0.75
+emission_enabled = true
+emission = Color(0.25, 0.28, 0.12, 1)
+emission_energy_multiplier = 0.06
+
+[sub_resource type="StandardMaterial3D" id="Mat_rune"]
+albedo_color = Color(0.35, 0.95, 0.35, 1)
+roughness = 0.3
+emission_enabled = true
+emission = Color(0.2, 1, 0.18, 1)
+emission_energy_multiplier = 2.2
+
+[sub_resource type="StandardMaterial3D" id="Mat_door"]
+albedo_color = Color(0.2, 0.08, 0.08, 1)
+roughness = 0.7
+metallic = 0.12
+
+[sub_resource type="StandardMaterial3D" id="Mat_door_correct"]
+albedo_color = Color(0.55, 0.42, 0.12, 1)
+roughness = 0.4
+emission_enabled = true
+emission = Color(1, 0.75, 0.2, 1)
+emission_energy_multiplier = 1.5
+
+[sub_resource type="StandardMaterial3D" id="Mat_yellow_glow"]
+albedo_color = Color(1, 0.78, 0.25, 1)
+roughness = 0.3
+emission_enabled = true
+emission = Color(1, 0.7, 0.15, 1)
+emission_energy_multiplier = 2.4
+shading_mode = 0
+
+[sub_resource type="StandardMaterial3D" id="Mat_green_pool"]
+albedo_color = Color(0.35, 0.85, 0.2, 0.75)
+transparency = 1
+roughness = 0.15
+emission_enabled = true
+emission = Color(0.3, 1, 0.15, 1)
+emission_energy_multiplier = 1.8
+shading_mode = 0
+
+[sub_resource type="StandardMaterial3D" id="Mat_crate"]
+albedo_color = Color(0.45, 0.22, 0.16, 1)
+roughness = 0.88
+
+[sub_resource type="BoxMesh" id="Mesh_box"]
+
+[sub_resource type="BoxShape3D" id="Shape_unit"]
+size = Vector3(1, 1, 1)
+
+[node name="NecropolisPoHHomage" type="Node3D"]
+
+; =============================================================================
+; SAFETY CATCH — deep underfloor so any missed gap still lands on solid ground
+; (enclosed pit under the whole lower complex, not endless void)
+; =============================================================================
+[node name="SafetyCatch" type="Node3D" parent="."]
+
+[node name="CatchFloor" type="StaticBody3D" parent="SafetyCatch"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 55, -78, 0)
+
+[node name="Mesh" type="MeshInstance3D" parent="SafetyCatch/CatchFloor"]
+transform = Transform3D(140, 0, 0, 0, 2, 0, 0, 0, 120, 0, 0, 0)
+material_override = SubResource("Mat_hive_dark")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="SafetyCatch/CatchFloor"]
+transform = Transform3D(140, 0, 0, 0, 2, 0, 0, 0, 120, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+[node name="CatchLabel" type="Label3D" parent="SafetyCatch"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 55, -74, 0)
+billboard = 1
+text = "UNDER-CAVERN (you fell through a gap)
+walk +X toward the yellow glow / hall"
+font_size = 28
+modulate = Color(0.7, 0.85, 1, 1)
+outline_size = 6
+horizontal_alignment = 1
+
+[node name="CatchLight" type="OmniLight3D" parent="SafetyCatch"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 55, -72, 0)
+light_color = Color(0.4, 0.55, 0.7, 1)
+light_energy = 2.5
+omni_range = 40.0
+
+; Ramp / stairs out of catch toward main necropolis floor level near door wall
+[node name="CatchRamp" type="StaticBody3D" parent="SafetyCatch"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 90, -71, 4)
+
+[node name="Mesh" type="MeshInstance3D" parent="SafetyCatch/CatchRamp"]
+transform = Transform3D(20, 0, 0, 0, 12, 0, 0, 0, 10, 0, 0, 0)
+material_override = SubResource("Mat_rock")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="SafetyCatch/CatchRamp"]
+transform = Transform3D(20, 0, 0, 0, 12, 0, 0, 0, 10, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+[node name="CatchExitPad" type="StaticBody3D" parent="SafetyCatch"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 108, -64.5, 4)
+
+[node name="Mesh" type="MeshInstance3D" parent="SafetyCatch/CatchExitPad"]
+transform = Transform3D(16, 0, 0, 0, 1, 0, 0, 0, 12, 0, 0, 0)
+material_override = SubResource("Mat_floor")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="SafetyCatch/CatchExitPad"]
+transform = Transform3D(16, 0, 0, 0, 1, 0, 0, 0, 12, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+; =============================================================================
+; LOWER DROP — rim + enclosed drop tube → vestibule
+; =============================================================================
+[node name="LowerDrop" type="Node3D" parent="."]
+
+[node name="RimN" type="StaticBody3D" parent="LowerDrop"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -44.5, -9)
+
+[node name="Mesh" type="MeshInstance3D" parent="LowerDrop/RimN"]
+transform = Transform3D(28, 0, 0, 0, 1.2, 0, 0, 0, 10, 0, 0, 0)
+material_override = SubResource("Mat_rock")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="LowerDrop/RimN"]
+transform = Transform3D(28, 0, 0, 0, 1.2, 0, 0, 0, 10, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+[node name="RimS" type="StaticBody3D" parent="LowerDrop"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -44.5, 9)
+
+[node name="Mesh" type="MeshInstance3D" parent="LowerDrop/RimS"]
+transform = Transform3D(28, 0, 0, 0, 1.2, 0, 0, 0, 10, 0, 0, 0)
+material_override = SubResource("Mat_rock")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="LowerDrop/RimS"]
+transform = Transform3D(28, 0, 0, 0, 1.2, 0, 0, 0, 10, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+[node name="RimE" type="StaticBody3D" parent="LowerDrop"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, -44.5, 0)
+
+[node name="Mesh" type="MeshInstance3D" parent="LowerDrop/RimE"]
+transform = Transform3D(10, 0, 0, 0, 1.2, 0, 0, 0, 8, 0, 0, 0)
+material_override = SubResource("Mat_rock")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="LowerDrop/RimE"]
+transform = Transform3D(10, 0, 0, 0, 1.2, 0, 0, 0, 8, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+[node name="RimW" type="StaticBody3D" parent="LowerDrop"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9, -44.5, 0)
+
+[node name="Mesh" type="MeshInstance3D" parent="LowerDrop/RimW"]
+transform = Transform3D(10, 0, 0, 0, 1.2, 0, 0, 0, 8, 0, 0, 0)
+material_override = SubResource("Mat_rock")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="LowerDrop/RimW"]
+transform = Transform3D(10, 0, 0, 0, 1.2, 0, 0, 0, 8, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+; Drop collar mid-fall only (y≈-52..-45). Stops ABOVE vestibule walk height
+; so landing isn't a sealed box — room opens east into the necropolis.
+[node name="TubeN" type="StaticBody3D" parent="LowerDrop"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -48.5, -5.5)
+
+[node name="Mesh" type="MeshInstance3D" parent="LowerDrop/TubeN"]
+transform = Transform3D(12, 0, 0, 0, 7, 0, 0, 0, 1.2, 0, 0, 0)
+material_override = SubResource("Mat_hive_dark")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="LowerDrop/TubeN"]
+transform = Transform3D(12, 0, 0, 0, 7, 0, 0, 0, 1.2, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+[node name="TubeS" type="StaticBody3D" parent="LowerDrop"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -48.5, 5.5)
+
+[node name="Mesh" type="MeshInstance3D" parent="LowerDrop/TubeS"]
+transform = Transform3D(12, 0, 0, 0, 7, 0, 0, 0, 1.2, 0, 0, 0)
+material_override = SubResource("Mat_hive_dark")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="LowerDrop/TubeS"]
+transform = Transform3D(12, 0, 0, 0, 7, 0, 0, 0, 1.2, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+[node name="TubeE" type="StaticBody3D" parent="LowerDrop"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.5, -48.5, 0)
+
+[node name="Mesh" type="MeshInstance3D" parent="LowerDrop/TubeE"]
+transform = Transform3D(1.2, 0, 0, 0, 7, 0, 0, 0, 10, 0, 0, 0)
+material_override = SubResource("Mat_hive_dark")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="LowerDrop/TubeE"]
+transform = Transform3D(1.2, 0, 0, 0, 7, 0, 0, 0, 10, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+[node name="TubeW" type="StaticBody3D" parent="LowerDrop"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.5, -48.5, 0)
+
+[node name="Mesh" type="MeshInstance3D" parent="LowerDrop/TubeW"]
+transform = Transform3D(1.2, 0, 0, 0, 7, 0, 0, 0, 10, 0, 0, 0)
+material_override = SubResource("Mat_hive_dark")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="LowerDrop/TubeW"]
+transform = Transform3D(1.2, 0, 0, 0, 7, 0, 0, 0, 10, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+[node name="DropSign" type="Label3D" parent="LowerDrop"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -42.5, -12)
+billboard = 1
+text = "▼ FURTHER DESCENT ▼
+(the meeting is below the meeting)"
+font_size = 28
+modulate = Color(1, 0.85, 0.45, 1)
+outline_size = 6
+horizontal_alignment = 1
+
+[node name="DropLight" type="OmniLight3D" parent="LowerDrop"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -50, 0)
+light_color = Color(0.4, 1, 0.25, 1)
+light_energy = 2.8
+omni_range = 14.0
+
+; =============================================================================
+; VESTIBULE — fully enclosed little cave
+; =============================================================================
+[node name="Vestibule" type="Node3D" parent="."]
+
+[node name="Floor" type="StaticBody3D" parent="Vestibule"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -59.5, 0)
+
+[node name="Mesh" type="MeshInstance3D" parent="Vestibule/Floor"]
+transform = Transform3D(24, 0, 0, 0, 1.2, 0, 0, 0, 24, 0, 0, 0)
+material_override = SubResource("Mat_floor")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="Vestibule/Floor"]
+transform = Transform3D(24, 0, 0, 0, 1.2, 0, 0, 0, 24, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+[node name="WallN" type="StaticBody3D" parent="Vestibule"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -54, -11.5)
+
+[node name="Mesh" type="MeshInstance3D" parent="Vestibule/WallN"]
+transform = Transform3D(24, 0, 0, 0, 10, 0, 0, 0, 2, 0, 0, 0)
+material_override = SubResource("Mat_rock")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="Vestibule/WallN"]
+transform = Transform3D(24, 0, 0, 0, 10, 0, 0, 0, 2, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+[node name="WallS" type="StaticBody3D" parent="Vestibule"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -54, 11.5)
+
+[node name="Mesh" type="MeshInstance3D" parent="Vestibule/WallS"]
+transform = Transform3D(24, 0, 0, 0, 10, 0, 0, 0, 2, 0, 0, 0)
+material_override = SubResource("Mat_rock")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="Vestibule/WallS"]
+transform = Transform3D(24, 0, 0, 0, 10, 0, 0, 0, 2, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+[node name="WallW" type="StaticBody3D" parent="Vestibule"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.5, -54, 0)
+
+[node name="Mesh" type="MeshInstance3D" parent="Vestibule/WallW"]
+transform = Transform3D(2, 0, 0, 0, 10, 0, 0, 0, 24, 0, 0, 0)
+material_override = SubResource("Mat_rock")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="Vestibule/WallW"]
+transform = Transform3D(2, 0, 0, 0, 10, 0, 0, 0, 24, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+; East wall with wide mouth into necropolis (gap |z|<5)
+[node name="WallE_N" type="StaticBody3D" parent="Vestibule"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.5, -54, -9)
+
+[node name="Mesh" type="MeshInstance3D" parent="Vestibule/WallE_N"]
+transform = Transform3D(2, 0, 0, 0, 10, 0, 0, 0, 8, 0, 0, 0)
+material_override = SubResource("Mat_rock")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="Vestibule/WallE_N"]
+transform = Transform3D(2, 0, 0, 0, 10, 0, 0, 0, 8, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+[node name="WallE_S" type="StaticBody3D" parent="Vestibule"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.5, -54, 9)
+
+[node name="Mesh" type="MeshInstance3D" parent="Vestibule/WallE_S"]
+transform = Transform3D(2, 0, 0, 0, 10, 0, 0, 0, 8, 0, 0, 0)
+material_override = SubResource("Mat_rock")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="Vestibule/WallE_S"]
+transform = Transform3D(2, 0, 0, 0, 10, 0, 0, 0, 8, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+; Ceiling with open drop hole (slabs)
+[node name="CeilN" type="StaticBody3D" parent="Vestibule"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -49.5, -8.5)
+
+[node name="Mesh" type="MeshInstance3D" parent="Vestibule/CeilN"]
+transform = Transform3D(24, 0, 0, 0, 1.2, 0, 0, 0, 9, 0, 0, 0)
+material_override = SubResource("Mat_rock")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="Vestibule/CeilN"]
+transform = Transform3D(24, 0, 0, 0, 1.2, 0, 0, 0, 9, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+[node name="CeilS" type="StaticBody3D" parent="Vestibule"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -49.5, 8.5)
+
+[node name="Mesh" type="MeshInstance3D" parent="Vestibule/CeilS"]
+transform = Transform3D(24, 0, 0, 0, 1.2, 0, 0, 0, 9, 0, 0, 0)
+material_override = SubResource("Mat_rock")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="Vestibule/CeilS"]
+transform = Transform3D(24, 0, 0, 0, 1.2, 0, 0, 0, 9, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+[node name="CeilE" type="StaticBody3D" parent="Vestibule"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.5, -49.5, 0)
+
+[node name="Mesh" type="MeshInstance3D" parent="Vestibule/CeilE"]
+transform = Transform3D(7, 0, 0, 0, 1.2, 0, 0, 0, 8, 0, 0, 0)
+material_override = SubResource("Mat_rock")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="Vestibule/CeilE"]
+transform = Transform3D(7, 0, 0, 0, 1.2, 0, 0, 0, 8, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+[node name="CeilW" type="StaticBody3D" parent="Vestibule"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.5, -49.5, 0)
+
+[node name="Mesh" type="MeshInstance3D" parent="Vestibule/CeilW"]
+transform = Transform3D(7, 0, 0, 0, 1.2, 0, 0, 0, 8, 0, 0, 0)
+material_override = SubResource("Mat_rock")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="Vestibule/CeilW"]
+transform = Transform3D(7, 0, 0, 0, 1.2, 0, 0, 0, 8, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+[node name="VestibuleLight" type="OmniLight3D" parent="Vestibule"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -54, 0)
+light_color = Color(0.45, 0.95, 0.3, 1)
+light_energy = 2.6
+omni_range = 18.0
+
+[node name="VestibuleSign" type="Label3D" parent="Vestibule"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 10, -54, 0)
+text = "VESTIBULE OF SCOPE
+→ exit this way → Necropolis"
+font_size = 28
+modulate = Color(0.85, 0.95, 0.7, 1)
+outline_size = 5
+horizontal_alignment = 1
+
+[node name="ExitGlow" type="OmniLight3D" parent="Vestibule"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, -56, 0)
+light_color = Color(0.4, 1, 0.3, 1)
+light_energy = 3.8
+omni_range = 12.0
+
+; Continuous floor bridge vestibule → necropolis (overlaps vestibule floor)
+[node name="ConnectorFloor" type="StaticBody3D" parent="Vestibule"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, -61.2, 0)
+
+[node name="Mesh" type="MeshInstance3D" parent="Vestibule/ConnectorFloor"]
+transform = Transform3D(18, 0, 0, 0, 2.5, 0, 0, 0, 12, 0, 0, 0)
+material_override = SubResource("Mat_floor")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="Vestibule/ConnectorFloor"]
+transform = Transform3D(18, 0, 0, 0, 2.5, 0, 0, 0, 12, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+[node name="ConnectorWallN" type="StaticBody3D" parent="Vestibule"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, -56, -6.5)
+
+[node name="Mesh" type="MeshInstance3D" parent="Vestibule/ConnectorWallN"]
+transform = Transform3D(14, 0, 0, 0, 10, 0, 0, 0, 1.2, 0, 0, 0)
+material_override = SubResource("Mat_rock")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="Vestibule/ConnectorWallN"]
+transform = Transform3D(14, 0, 0, 0, 10, 0, 0, 0, 1.2, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+[node name="ConnectorWallS" type="StaticBody3D" parent="Vestibule"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, -56, 6.5)
+
+[node name="Mesh" type="MeshInstance3D" parent="Vestibule/ConnectorWallS"]
+transform = Transform3D(14, 0, 0, 0, 10, 0, 0, 0, 1.2, 0, 0, 0)
+material_override = SubResource("Mat_rock")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="Vestibule/ConnectorWallS"]
+transform = Transform3D(14, 0, 0, 0, 10, 0, 0, 0, 1.2, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+[node name="ConnectorCeil" type="StaticBody3D" parent="Vestibule"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, -50.5, 0)
+
+[node name="Mesh" type="MeshInstance3D" parent="Vestibule/ConnectorCeil"]
+transform = Transform3D(14, 0, 0, 0, 1.2, 0, 0, 0, 12, 0, 0, 0)
+material_override = SubResource("Mat_rock")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="Vestibule/ConnectorCeil"]
+transform = Transform3D(14, 0, 0, 0, 1.2, 0, 0, 0, 12, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+; =============================================================================
+; NECROPOLIS — huge hive cavern (~100 × 100 floor)
+; Floor y=-64.5; x≈5..110; z≈-52..52
+; =============================================================================
+[node name="Necropolis" type="Node3D" parent="."]
+
+[node name="Floor" type="StaticBody3D" parent="Necropolis"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 58, -64.5, 0)
+
+[node name="Mesh" type="MeshInstance3D" parent="Necropolis/Floor"]
+transform = Transform3D(108, 0, 0, 0, 1.4, 0, 0, 0, 108, 0, 0, 0)
+material_override = SubResource("Mat_floor")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="Necropolis/Floor"]
+transform = Transform3D(108, 0, 0, 0, 1.4, 0, 0, 0, 108, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+[node name="Ceiling" type="StaticBody3D" parent="Necropolis"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 58, -42, 0)
+
+[node name="Mesh" type="MeshInstance3D" parent="Necropolis/Ceiling"]
+transform = Transform3D(112, 0, 0, 0, 2.5, 0, 0, 0, 112, 0, 0, 0)
+material_override = SubResource("Mat_rock")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="Necropolis/Ceiling"]
+transform = Transform3D(112, 0, 0, 0, 2.5, 0, 0, 0, 112, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+[node name="WallN" type="StaticBody3D" parent="Necropolis"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 58, -53, -54)
+
+[node name="Mesh" type="MeshInstance3D" parent="Necropolis/WallN"]
+transform = Transform3D(112, 0, 0, 0, 22, 0, 0, 0, 3, 0, 0, 0)
+material_override = SubResource("Mat_rock")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="Necropolis/WallN"]
+transform = Transform3D(112, 0, 0, 0, 22, 0, 0, 0, 3, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+[node name="WallS" type="StaticBody3D" parent="Necropolis"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 58, -53, 54)
+
+[node name="Mesh" type="MeshInstance3D" parent="Necropolis/WallS"]
+transform = Transform3D(112, 0, 0, 0, 22, 0, 0, 0, 3, 0, 0, 0)
+material_override = SubResource("Mat_rock")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="Necropolis/WallS"]
+transform = Transform3D(112, 0, 0, 0, 22, 0, 0, 0, 3, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+; West wall (entry) — gap |z|<5 for vestibule mouth
+[node name="WallW_N" type="StaticBody3D" parent="Necropolis"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, -53, -30)
+
+[node name="Mesh" type="MeshInstance3D" parent="Necropolis/WallW_N"]
+transform = Transform3D(3, 0, 0, 0, 22, 0, 0, 0, 50, 0, 0, 0)
+material_override = SubResource("Mat_rock")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="Necropolis/WallW_N"]
+transform = Transform3D(3, 0, 0, 0, 22, 0, 0, 0, 50, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+[node name="WallW_S" type="StaticBody3D" parent="Necropolis"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, -53, 30)
+
+[node name="Mesh" type="MeshInstance3D" parent="Necropolis/WallW_S"]
+transform = Transform3D(3, 0, 0, 0, 22, 0, 0, 0, 50, 0, 0, 0)
+material_override = SubResource("Mat_rock")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="Necropolis/WallW_S"]
+transform = Transform3D(3, 0, 0, 0, 22, 0, 0, 0, 50, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+; West wall top lintel over entry mouth (so gap isn't open to ceiling void)
+[node name="WallW_Lintel" type="StaticBody3D" parent="Necropolis"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, -46, 0)
+
+[node name="Mesh" type="MeshInstance3D" parent="Necropolis/WallW_Lintel"]
+transform = Transform3D(3, 0, 0, 0, 8, 0, 0, 0, 12, 0, 0, 0)
+material_override = SubResource("Mat_rock")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="Necropolis/WallW_Lintel"]
+transform = Transform3D(3, 0, 0, 0, 8, 0, 0, 0, 12, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+[node name="AmbientA" type="OmniLight3D" parent="Necropolis"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 28, -52, -20)
+light_color = Color(0.45, 0.95, 0.25, 1)
+light_energy = 4.5
+omni_range = 42.0
+
+[node name="AmbientB" type="OmniLight3D" parent="Necropolis"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 70, -50, 18)
+light_color = Color(0.55, 0.85, 0.3, 1)
+light_energy = 3.8
+omni_range = 40.0
+
+[node name="AmbientC" type="OmniLight3D" parent="Necropolis"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 50, -48, 0)
+light_color = Color(0.7, 0.35, 0.25, 1)
+light_energy = 2.4
+omni_range = 48.0
+
+[node name="AmbientD" type="OmniLight3D" parent="Necropolis"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 90, -54, -8)
+light_color = Color(0.95, 0.75, 0.25, 1)
+light_energy = 2.5
+omni_range = 30.0
+
+[node name="CavernCaption" type="Label3D" parent="Necropolis"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35, -50, 0)
+billboard = 1
+text = "NECROPOLIS OF THE ORG CHART
+(hive city · wall of doors · one correct path)"
+font_size = 42
+modulate = Color(0.55, 1, 0.4, 1)
+outline_size = 8
+horizontal_alignment = 1
+
+; Bone pillars + sickly green ritual pool (PoH lock-chamber vibe)
+[node name="BonePillars" type="Node3D" parent="Necropolis"]
+
+[node name="PillarA" type="StaticBody3D" parent="Necropolis/BonePillars"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 45, -54, -20)
+
+[node name="Mesh" type="MeshInstance3D" parent="Necropolis/BonePillars/PillarA"]
+transform = Transform3D(2.2, 0, 0, 0, 20, 0, 0, 0, 2.2, 0, 0, 0)
+material_override = SubResource("Mat_bone")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="Necropolis/BonePillars/PillarA"]
+transform = Transform3D(2.2, 0, 0, 0, 20, 0, 0, 0, 2.2, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+[node name="PillarB" type="StaticBody3D" parent="Necropolis/BonePillars"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 62, -54, 16)
+
+[node name="Mesh" type="MeshInstance3D" parent="Necropolis/BonePillars/PillarB"]
+transform = Transform3D(2.0, 0, 0, 0, 18, 0, 0, 0, 2.0, 0, 0, 0)
+material_override = SubResource("Mat_bone")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="Necropolis/BonePillars/PillarB"]
+transform = Transform3D(2.0, 0, 0, 0, 18, 0, 0, 0, 2.0, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+[node name="PillarC" type="StaticBody3D" parent="Necropolis/BonePillars"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 78, -54, -14)
+
+[node name="Mesh" type="MeshInstance3D" parent="Necropolis/BonePillars/PillarC"]
+transform = Transform3D(2.4, 0, 0, 0, 22, 0, 0, 0, 2.4, 0, 0, 0)
+material_override = SubResource("Mat_bone")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="Necropolis/BonePillars/PillarC"]
+transform = Transform3D(2.4, 0, 0, 0, 22, 0, 0, 0, 2.4, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+[node name="PillarD" type="StaticBody3D" parent="Necropolis/BonePillars"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35, -54, 24)
+
+[node name="Mesh" type="MeshInstance3D" parent="Necropolis/BonePillars/PillarD"]
+transform = Transform3D(1.8, 0, 0, 0, 16, 0, 0, 0, 1.8, 0, 0, 0)
+material_override = SubResource("Mat_bone")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="Necropolis/BonePillars/PillarD"]
+transform = Transform3D(1.8, 0, 0, 0, 16, 0, 0, 0, 1.8, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+[node name="GreenPool" type="MeshInstance3D" parent="Necropolis"]
+transform = Transform3D(14, 0, 0, 0, 0.15, 0, 0, 0, 14, 52, -63.7, -2)
+material_override = SubResource("Mat_green_pool")
+cast_shadow = 0
+mesh = SubResource("Mesh_box")
+
+[node name="PoolRing" type="MeshInstance3D" parent="Necropolis"]
+transform = Transform3D(16, 0, 0, 0, 0.4, 0, 0, 0, 16, 52, -63.9, -2)
+material_override = SubResource("Mat_bone")
+mesh = SubResource("Mesh_box")
+
+[node name="PoolLight" type="OmniLight3D" parent="Necropolis"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 52, -60, -2)
+light_color = Color(0.45, 1, 0.2, 1)
+light_energy = 6.0
+omni_range = 22.0
+
+[node name="PoolSpire" type="MeshInstance3D" parent="Necropolis"]
+transform = Transform3D(1.2, 0, 0, 0, 6, 0, 0, 0, 1.2, 52, -60.5, -2)
+material_override = SubResource("Mat_rune")
+cast_shadow = 0
+mesh = SubResource("Mesh_box")
+
+; -----------------------------------------------------------------------------
+; HIVE DISTRICT — near (west) side, more buildings, glowing runes
+; -----------------------------------------------------------------------------
+[node name="HiveDistrict" type="Node3D" parent="Necropolis"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22, -64, 0)
+
+[node name="TowerA" type="StaticBody3D" parent="Necropolis/HiveDistrict"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 7, -28)
+
+[node name="Mesh" type="MeshInstance3D" parent="Necropolis/HiveDistrict/TowerA"]
+transform = Transform3D(6, 0, 0, 0, 14, 0, 0, 0, 6, 0, 0, 0)
+material_override = SubResource("Mat_hive")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="Necropolis/HiveDistrict/TowerA"]
+transform = Transform3D(6, 0, 0, 0, 14, 0, 0, 0, 6, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+[node name="Rune" type="MeshInstance3D" parent="Necropolis/HiveDistrict/TowerA"]
+transform = Transform3D(2.4, 0, 0, 0, 2.4, 0, 0, 0, 0.25, 3.1, 2, 0)
+material_override = SubResource("Mat_rune")
+cast_shadow = 0
+mesh = SubResource("Mesh_box")
+
+[node name="Label" type="Label3D" parent="Necropolis/HiveDistrict/TowerA"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.8, 5, 0)
+billboard = 1
+text = "KPI"
+font_size = 42
+modulate = Color(0.5, 1, 0.45, 1)
+outline_size = 6
+
+[node name="TowerB" type="StaticBody3D" parent="Necropolis/HiveDistrict"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 9, -14)
+
+[node name="Mesh" type="MeshInstance3D" parent="Necropolis/HiveDistrict/TowerB"]
+transform = Transform3D(7, 0, 0, 0, 18, 0, 0, 0, 7, 0, 0, 0)
+material_override = SubResource("Mat_hive")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="Necropolis/HiveDistrict/TowerB"]
+transform = Transform3D(7, 0, 0, 0, 18, 0, 0, 0, 7, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+[node name="Rune" type="MeshInstance3D" parent="Necropolis/HiveDistrict/TowerB"]
+transform = Transform3D(3, 0, 0, 0, 3, 0, 0, 0, 0.25, 3.6, 3, 0)
+material_override = SubResource("Mat_rune")
+cast_shadow = 0
+mesh = SubResource("Mesh_box")
+
+[node name="Label" type="Label3D" parent="Necropolis/HiveDistrict/TowerB"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.2, 6, 0)
+billboard = 1
+text = "OKR"
+font_size = 48
+modulate = Color(0.5, 1, 0.45, 1)
+outline_size = 6
+
+[node name="TowerC" type="StaticBody3D" parent="Necropolis/HiveDistrict"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 6, 0)
+
+[node name="Mesh" type="MeshInstance3D" parent="Necropolis/HiveDistrict/TowerC"]
+transform = Transform3D(5.5, 0, 0, 0, 12, 0, 0, 0, 5.5, 0, 0, 0)
+material_override = SubResource("Mat_hive")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="Necropolis/HiveDistrict/TowerC"]
+transform = Transform3D(5.5, 0, 0, 0, 12, 0, 0, 0, 5.5, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+[node name="Rune" type="MeshInstance3D" parent="Necropolis/HiveDistrict/TowerC"]
+transform = Transform3D(2.2, 0, 0, 0, 2.2, 0, 0, 0, 0.25, 2.9, 1.5, 0)
+material_override = SubResource("Mat_rune")
+cast_shadow = 0
+mesh = SubResource("Mesh_box")
+
+[node name="Label" type="Label3D" parent="Necropolis/HiveDistrict/TowerC"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5, 4, 0)
+billboard = 1
+text = "RACI"
+font_size = 40
+modulate = Color(0.5, 1, 0.45, 1)
+outline_size = 6
+
+[node name="TowerD" type="StaticBody3D" parent="Necropolis/HiveDistrict"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 8, 14)
+
+[node name="Mesh" type="MeshInstance3D" parent="Necropolis/HiveDistrict/TowerD"]
+transform = Transform3D(6.5, 0, 0, 0, 16, 0, 0, 0, 6.5, 0, 0, 0)
+material_override = SubResource("Mat_hive")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="Necropolis/HiveDistrict/TowerD"]
+transform = Transform3D(6.5, 0, 0, 0, 16, 0, 0, 0, 6.5, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+[node name="Rune" type="MeshInstance3D" parent="Necropolis/HiveDistrict/TowerD"]
+transform = Transform3D(2.6, 0, 0, 0, 2.6, 0, 0, 0, 0.25, 3.4, 2.5, 0)
+material_override = SubResource("Mat_rune")
+cast_shadow = 0
+mesh = SubResource("Mesh_box")
+
+[node name="Label" type="Label3D" parent="Necropolis/HiveDistrict/TowerD"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 5.5, 0)
+billboard = 1
+text = "BOARD"
+font_size = 42
+modulate = Color(0.5, 1, 0.45, 1)
+outline_size = 6
+
+[node name="TowerE" type="StaticBody3D" parent="Necropolis/HiveDistrict"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 5.5, 28)
+
+[node name="Mesh" type="MeshInstance3D" parent="Necropolis/HiveDistrict/TowerE"]
+transform = Transform3D(5, 0, 0, 0, 11, 0, 0, 0, 5, 0, 0, 0)
+material_override = SubResource("Mat_hive")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="Necropolis/HiveDistrict/TowerE"]
+transform = Transform3D(5, 0, 0, 0, 11, 0, 0, 0, 5, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+[node name="Rune" type="MeshInstance3D" parent="Necropolis/HiveDistrict/TowerE"]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 0.25, 2.6, 1, 0)
+material_override = SubResource("Mat_rune")
+cast_shadow = 0
+mesh = SubResource("Mesh_box")
+
+[node name="TowerF" type="StaticBody3D" parent="Necropolis/HiveDistrict"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 6, -36)
+
+[node name="Mesh" type="MeshInstance3D" parent="Necropolis/HiveDistrict/TowerF"]
+transform = Transform3D(4.5, 0, 0, 0, 12, 0, 0, 0, 4.5, 0, 0, 0)
+material_override = SubResource("Mat_hive_dark")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="Necropolis/HiveDistrict/TowerF"]
+transform = Transform3D(4.5, 0, 0, 0, 12, 0, 0, 0, 4.5, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+[node name="Rune" type="MeshInstance3D" parent="Necropolis/HiveDistrict/TowerF"]
+transform = Transform3D(1.8, 0, 0, 0, 2.5, 0, 0, 0, 0.2, 2.4, 2, 0)
+material_override = SubResource("Mat_rune")
+cast_shadow = 0
+mesh = SubResource("Mesh_box")
+
+[node name="Spire" type="StaticBody3D" parent="Necropolis/HiveDistrict"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 11, 36)
+
+[node name="Mesh" type="MeshInstance3D" parent="Necropolis/HiveDistrict/Spire"]
+transform = Transform3D(4, 0, 0, 0, 22, 0, 0, 0, 4, 0, 0, 0)
+material_override = SubResource("Mat_hive_dark")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="Necropolis/HiveDistrict/Spire"]
+transform = Transform3D(4, 0, 0, 0, 22, 0, 0, 0, 4, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+[node name="Rune" type="MeshInstance3D" parent="Necropolis/HiveDistrict/Spire"]
+transform = Transform3D(1.8, 0, 0, 0, 4, 0, 0, 0, 0.2, 2.1, 3, 0)
+material_override = SubResource("Mat_rune")
+cast_shadow = 0
+mesh = SubResource("Mesh_box")
+
+[node name="MidBlock" type="StaticBody3D" parent="Necropolis/HiveDistrict"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 4, -6)
+
+[node name="Mesh" type="MeshInstance3D" parent="Necropolis/HiveDistrict/MidBlock"]
+transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 0, 0, 0)
+material_override = SubResource("Mat_hive")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="Necropolis/HiveDistrict/MidBlock"]
+transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+[node name="Rune" type="MeshInstance3D" parent="Necropolis/HiveDistrict/MidBlock"]
+transform = Transform3D(3, 0, 0, 0, 3, 0, 0, 0, 0.25, 4.1, 1, 0)
+material_override = SubResource("Mat_rune")
+cast_shadow = 0
+mesh = SubResource("Mesh_box")
+
+[node name="HiveGlow" type="OmniLight3D" parent="Necropolis/HiveDistrict"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 12, 0)
+light_color = Color(0.35, 1, 0.2, 1)
+light_energy = 7.0
+omni_range = 38.0
+
+[node name="HiveCaption" type="Label3D" parent="Necropolis/HiveDistrict"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 16, 0)
+billboard = 1
+text = "HIVE DISTRICT
+(chitin towers · glowing heresy)"
+font_size = 32
+modulate = Color(0.55, 1, 0.4, 1)
+outline_size = 6
+horizontal_alignment = 1
+
+; Roof spikes on towers (Hive skyline)
+[node name="SpikeA" type="MeshInstance3D" parent="Necropolis/HiveDistrict"]
+transform = Transform3D(1.5, 0, 0, 0, 4, 0, 0, 0, 1.5, -2, 16, -28)
+material_override = SubResource("Mat_bone")
+mesh = SubResource("Mesh_box")
+
+[node name="SpikeB" type="MeshInstance3D" parent="Necropolis/HiveDistrict"]
+transform = Transform3D(1.8, 0, 0, 0, 5, 0, 0, 0, 1.8, 4, 20, -14)
+material_override = SubResource("Mat_bone")
+mesh = SubResource("Mesh_box")
+
+[node name="SpikeC" type="MeshInstance3D" parent="Necropolis/HiveDistrict"]
+transform = Transform3D(1.4, 0, 0, 0, 4.5, 0, 0, 0, 1.4, 5, 18, 14)
+material_override = SubResource("Mat_bone")
+mesh = SubResource("Mesh_box")
+
+[node name="SpikeD" type="MeshInstance3D" parent="Necropolis/HiveDistrict"]
+transform = Transform3D(1.2, 0, 0, 0, 6, 0, 0, 0, 1.2, 8, 24, 36)
+material_override = SubResource("Mat_bone")
+mesh = SubResource("Mesh_box")
+
+; -----------------------------------------------------------------------------
+; WALL OF DOORS — far east wall; sealed mass + lower yellow correct door
+; World x≈110
+; -----------------------------------------------------------------------------
+[node name="WallOfDoors" type="Node3D" parent="Necropolis"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 110, -53, 0)
+
+; Full-height wall with only lower center gap for correct door
+[node name="BackWall_Upper" type="StaticBody3D" parent="Necropolis/WallOfDoors"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 0)
+
+[node name="Mesh" type="MeshInstance3D" parent="Necropolis/WallOfDoors/BackWall_Upper"]
+transform = Transform3D(4, 0, 0, 0, 14, 0, 0, 0, 110, 0, 0, 0)
+material_override = SubResource("Mat_rock")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="Necropolis/WallOfDoors/BackWall_Upper"]
+transform = Transform3D(4, 0, 0, 0, 14, 0, 0, 0, 110, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+[node name="BackWall_LowerN" type="StaticBody3D" parent="Necropolis/WallOfDoors"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -6, -28)
+
+[node name="Mesh" type="MeshInstance3D" parent="Necropolis/WallOfDoors/BackWall_LowerN"]
+transform = Transform3D(4, 0, 0, 0, 10, 0, 0, 0, 52, 0, 0, 0)
+material_override = SubResource("Mat_rock")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="Necropolis/WallOfDoors/BackWall_LowerN"]
+transform = Transform3D(4, 0, 0, 0, 10, 0, 0, 0, 52, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+[node name="BackWall_LowerS" type="StaticBody3D" parent="Necropolis/WallOfDoors"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -6, 30)
+
+[node name="Mesh" type="MeshInstance3D" parent="Necropolis/WallOfDoors/BackWall_LowerS"]
+transform = Transform3D(4, 0, 0, 0, 10, 0, 0, 0, 48, 0, 0, 0)
+material_override = SubResource("Mat_rock")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="Necropolis/WallOfDoors/BackWall_LowerS"]
+transform = Transform3D(4, 0, 0, 0, 10, 0, 0, 0, 48, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+; Gap for correct door: LowerN ends ~z=-2, LowerS starts ~z=6 → open z=-2..6
+
+[node name="Doors" type="Node3D" parent="Necropolis/WallOfDoors"]
+
+[node name="D0" type="MeshInstance3D" parent="Necropolis/WallOfDoors/Doors"]
+transform = Transform3D(0.45, 0, 0, 0, 3.4, 0, 0, 0, 2.4, -2.1, -7, -42)
+material_override = SubResource("Mat_door")
+mesh = SubResource("Mesh_box")
+
+[node name="D1" type="MeshInstance3D" parent="Necropolis/WallOfDoors/Doors"]
+transform = Transform3D(0.45, 0, 0, 0, 3.8, 0, 0, 0, 2.6, -2.1, -3, -34)
+material_override = SubResource("Mat_door")
+mesh = SubResource("Mesh_box")
+
+[node name="D2" type="MeshInstance3D" parent="Necropolis/WallOfDoors/Doors"]
+transform = Transform3D(0.45, 0, 0, 0, 3.4, 0, 0, 0, 2.4, -2.1, 1, -26)
+material_override = SubResource("Mat_door")
+mesh = SubResource("Mesh_box")
+
+[node name="D3" type="MeshInstance3D" parent="Necropolis/WallOfDoors/Doors"]
+transform = Transform3D(0.45, 0, 0, 0, 4.2, 0, 0, 0, 2.8, -2.1, 3, -18)
+material_override = SubResource("Mat_door")
+mesh = SubResource("Mesh_box")
+
+[node name="D4" type="MeshInstance3D" parent="Necropolis/WallOfDoors/Doors"]
+transform = Transform3D(0.45, 0, 0, 0, 3.4, 0, 0, 0, 2.4, -2.1, -5, -10)
+material_override = SubResource("Mat_door")
+mesh = SubResource("Mesh_box")
+
+[node name="D5" type="MeshInstance3D" parent="Necropolis/WallOfDoors/Doors"]
+transform = Transform3D(0.45, 0, 0, 0, 3.6, 0, 0, 0, 2.5, -2.1, 2, 12)
+material_override = SubResource("Mat_door")
+mesh = SubResource("Mesh_box")
+
+[node name="D6" type="MeshInstance3D" parent="Necropolis/WallOfDoors/Doors"]
+transform = Transform3D(0.45, 0, 0, 0, 3.4, 0, 0, 0, 2.4, -2.1, -4, 20)
+material_override = SubResource("Mat_door")
+mesh = SubResource("Mesh_box")
+
+[node name="D7" type="MeshInstance3D" parent="Necropolis/WallOfDoors/Doors"]
+transform = Transform3D(0.45, 0, 0, 0, 3.8, 0, 0, 0, 2.6, -2.1, 0, 28)
+material_override = SubResource("Mat_door")
+mesh = SubResource("Mesh_box")
+
+[node name="D8" type="MeshInstance3D" parent="Necropolis/WallOfDoors/Doors"]
+transform = Transform3D(0.45, 0, 0, 0, 3.4, 0, 0, 0, 2.4, -2.1, 4, 36)
+material_override = SubResource("Mat_door")
+mesh = SubResource("Mesh_box")
+
+[node name="D9" type="MeshInstance3D" parent="Necropolis/WallOfDoors/Doors"]
+transform = Transform3D(0.45, 0, 0, 0, 3.2, 0, 0, 0, 2.2, -2.1, 5.5, -40)
+material_override = SubResource("Mat_door")
+mesh = SubResource("Mesh_box")
+
+[node name="D10" type="MeshInstance3D" parent="Necropolis/WallOfDoors/Doors"]
+transform = Transform3D(0.45, 0, 0, 0, 3, 0, 0, 0, 2, -2.1, 6, 16)
+material_override = SubResource("Mat_door")
+mesh = SubResource("Mesh_box")
+
+[node name="D11" type="MeshInstance3D" parent="Necropolis/WallOfDoors/Doors"]
+transform = Transform3D(0.45, 0, 0, 0, 3.5, 0, 0, 0, 2.4, -2.1, -2, 44)
+material_override = SubResource("Mat_door")
+mesh = SubResource("Mesh_box")
+
+[node name="D12" type="MeshInstance3D" parent="Necropolis/WallOfDoors/Doors"]
+transform = Transform3D(0.45, 0, 0, 0, 3.2, 0, 0, 0, 2.2, -2.1, 3, -48)
+material_override = SubResource("Mat_door")
+mesh = SubResource("Mesh_box")
+
+[node name="CorrectDoor" type="Node3D" parent="Necropolis/WallOfDoors"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -8.5, 2)
+
+[node name="Frame" type="MeshInstance3D" parent="Necropolis/WallOfDoors/CorrectDoor"]
+transform = Transform3D(0.55, 0, 0, 0, 4.5, 0, 0, 0, 3.8, -1.8, 0, 0)
+material_override = SubResource("Mat_door_correct")
+mesh = SubResource("Mesh_box")
+
+[node name="GlowPanel" type="MeshInstance3D" parent="Necropolis/WallOfDoors/CorrectDoor"]
+transform = Transform3D(0.25, 0, 0, 0, 3.6, 0, 0, 0, 2.8, -1.4, 0, 0)
+material_override = SubResource("Mat_yellow_glow")
+cast_shadow = 0
+mesh = SubResource("Mesh_box")
+
+[node name="YellowLight" type="OmniLight3D" parent="Necropolis/WallOfDoors/CorrectDoor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, 0)
+light_color = Color(1, 0.78, 0.22, 1)
+light_energy = 10.0
+omni_range = 28.0
+
+[node name="YellowSpot" type="SpotLight3D" parent="Necropolis/WallOfDoors/CorrectDoor"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 2, 0, 0)
+light_color = Color(1, 0.82, 0.3, 1)
+light_energy = 8.0
+spot_range = 36.0
+spot_angle = 40.0
+
+[node name="DoorLabel" type="Label3D" parent="Necropolis/WallOfDoors/CorrectDoor"]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, -2.6, 2.8, 0)
+text = "◆ THE CORRECT DOOR ◆
+(lit from behind · lower row)
+Shareholder Hall this way"
+font_size = 28
+modulate = Color(1, 0.9, 0.45, 1)
+outline_size = 6
+horizontal_alignment = 1
+
+[node name="WallCaption" type="Label3D" parent="Necropolis/WallOfDoors"]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, -2.8, 10, 0)
+text = "WALL OF DOORS
+Almost all sealed for Q4.
+Find the one glowing yellow."
+font_size = 34
+modulate = Color(0.9, 0.85, 0.7, 1)
+outline_size = 6
+horizontal_alignment = 1
+
+; =============================================================================
+; ANTECHAMBER — fully enclosed room past correct door → continuous hall bridge
+; =============================================================================
+[node name="Antechamber" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 124, -64, 2)
+
+[node name="Floor" type="StaticBody3D" parent="Antechamber"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+
+[node name="Mesh" type="MeshInstance3D" parent="Antechamber/Floor"]
+transform = Transform3D(28, 0, 0, 0, 1.2, 0, 0, 0, 14, 0, 0, 0)
+material_override = SubResource("Mat_floor")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="Antechamber/Floor"]
+transform = Transform3D(28, 0, 0, 0, 1.2, 0, 0, 0, 14, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+[node name="WallN" type="StaticBody3D" parent="Antechamber"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.5, -6.5)
+
+[node name="Mesh" type="MeshInstance3D" parent="Antechamber/WallN"]
+transform = Transform3D(28, 0, 0, 0, 8, 0, 0, 0, 1.5, 0, 0, 0)
+material_override = SubResource("Mat_rock")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="Antechamber/WallN"]
+transform = Transform3D(28, 0, 0, 0, 8, 0, 0, 0, 1.5, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+[node name="WallS" type="StaticBody3D" parent="Antechamber"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.5, 6.5)
+
+[node name="Mesh" type="MeshInstance3D" parent="Antechamber/WallS"]
+transform = Transform3D(28, 0, 0, 0, 8, 0, 0, 0, 1.5, 0, 0, 0)
+material_override = SubResource("Mat_rock")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="Antechamber/WallS"]
+transform = Transform3D(28, 0, 0, 0, 8, 0, 0, 0, 1.5, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+; West wall pieces leave door gap |z|<3.5
+[node name="WallW_N" type="StaticBody3D" parent="Antechamber"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.5, 3.5, -4.5)
+
+[node name="Mesh" type="MeshInstance3D" parent="Antechamber/WallW_N"]
+transform = Transform3D(1.5, 0, 0, 0, 8, 0, 0, 0, 5, 0, 0, 0)
+material_override = SubResource("Mat_rock")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="Antechamber/WallW_N"]
+transform = Transform3D(1.5, 0, 0, 0, 8, 0, 0, 0, 5, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+[node name="WallW_S" type="StaticBody3D" parent="Antechamber"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.5, 3.5, 4.5)
+
+[node name="Mesh" type="MeshInstance3D" parent="Antechamber/WallW_S"]
+transform = Transform3D(1.5, 0, 0, 0, 8, 0, 0, 0, 5, 0, 0, 0)
+material_override = SubResource("Mat_rock")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="Antechamber/WallW_S"]
+transform = Transform3D(1.5, 0, 0, 0, 8, 0, 0, 0, 5, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+; East wall pieces leave hall exit |z|<3
+[node name="WallE_N" type="StaticBody3D" parent="Antechamber"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.5, 3.5, -4.5)
+
+[node name="Mesh" type="MeshInstance3D" parent="Antechamber/WallE_N"]
+transform = Transform3D(1.5, 0, 0, 0, 8, 0, 0, 0, 5, 0, 0, 0)
+material_override = SubResource("Mat_rock")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="Antechamber/WallE_N"]
+transform = Transform3D(1.5, 0, 0, 0, 8, 0, 0, 0, 5, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+[node name="WallE_S" type="StaticBody3D" parent="Antechamber"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.5, 3.5, 4.5)
+
+[node name="Mesh" type="MeshInstance3D" parent="Antechamber/WallE_S"]
+transform = Transform3D(1.5, 0, 0, 0, 8, 0, 0, 0, 5, 0, 0, 0)
+material_override = SubResource("Mat_rock")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="Antechamber/WallE_S"]
+transform = Transform3D(1.5, 0, 0, 0, 8, 0, 0, 0, 5, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+[node name="Ceiling" type="StaticBody3D" parent="Antechamber"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8, 0)
+
+[node name="Mesh" type="MeshInstance3D" parent="Antechamber/Ceiling"]
+transform = Transform3D(28, 0, 0, 0, 1.2, 0, 0, 0, 14, 0, 0, 0)
+material_override = SubResource("Mat_rock")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="Antechamber/Ceiling"]
+transform = Transform3D(28, 0, 0, 0, 1.2, 0, 0, 0, 14, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+[node name="Light" type="OmniLight3D" parent="Antechamber"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 0)
+light_color = Color(1, 0.85, 0.45, 1)
+light_energy = 3.2
+omni_range = 18.0
+
+[node name="Sign" type="Label3D" parent="Antechamber"]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 10, 4, 0)
+text = "ANTECHAMBER
+You picked the correct door.
+Shareholder Hall →"
+font_size = 28
+modulate = Color(1, 0.9, 0.55, 1)
+outline_size = 5
+horizontal_alignment = 1
+
+; Bridge into shareholder hall (enclosed so no side falls)
+[node name="HallBridge" type="Node3D" parent="Antechamber"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 0, 0)
+
+[node name="Floor" type="StaticBody3D" parent="Antechamber/HallBridge"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+
+[node name="Mesh" type="MeshInstance3D" parent="Antechamber/HallBridge/Floor"]
+transform = Transform3D(16, 0, 0, 0, 1.2, 0, 0, 0, 8, 0, 0, 0)
+material_override = SubResource("Mat_floor")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="Antechamber/HallBridge/Floor"]
+transform = Transform3D(16, 0, 0, 0, 1.2, 0, 0, 0, 8, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+[node name="WallN" type="StaticBody3D" parent="Antechamber/HallBridge"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, -3.8)
+
+[node name="Mesh" type="MeshInstance3D" parent="Antechamber/HallBridge/WallN"]
+transform = Transform3D(16, 0, 0, 0, 7, 0, 0, 0, 1.2, 0, 0, 0)
+material_override = SubResource("Mat_rock")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="Antechamber/HallBridge/WallN"]
+transform = Transform3D(16, 0, 0, 0, 7, 0, 0, 0, 1.2, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+[node name="WallS" type="StaticBody3D" parent="Antechamber/HallBridge"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, 3.8)
+
+[node name="Mesh" type="MeshInstance3D" parent="Antechamber/HallBridge/WallS"]
+transform = Transform3D(16, 0, 0, 0, 7, 0, 0, 0, 1.2, 0, 0, 0)
+material_override = SubResource("Mat_rock")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="Antechamber/HallBridge/WallS"]
+transform = Transform3D(16, 0, 0, 0, 7, 0, 0, 0, 1.2, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+[node name="Ceiling" type="StaticBody3D" parent="Antechamber/HallBridge"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7, 0)
+
+[node name="Mesh" type="MeshInstance3D" parent="Antechamber/HallBridge/Ceiling"]
+transform = Transform3D(16, 0, 0, 0, 1.2, 0, 0, 0, 8, 0, 0, 0)
+material_override = SubResource("Mat_rock")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="Antechamber/HallBridge/Ceiling"]
+transform = Transform3D(16, 0, 0, 0, 1.2, 0, 0, 0, 8, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+; =============================================================================
+; JUMP BOXES — get above sword height (~1.65m) to whiff Comment Knights
+; Floor surface y=-64.5; box tops at ~-61.5 to -60
+; =============================================================================
+[node name="JumpBoxes" type="Node3D" parent="Necropolis"]
+
+[node name="BoxStackA" type="StaticBody3D" parent="Necropolis/JumpBoxes"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 40, -62.5, -12)
+
+[node name="Mesh" type="MeshInstance3D" parent="Necropolis/JumpBoxes/BoxStackA"]
+transform = Transform3D(3.2, 0, 0, 0, 3.5, 0, 0, 0, 3.2, 0, 0, 0)
+material_override = SubResource("Mat_crate")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="Necropolis/JumpBoxes/BoxStackA"]
+transform = Transform3D(3.2, 0, 0, 0, 3.5, 0, 0, 0, 3.2, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+[node name="BoxStackB" type="StaticBody3D" parent="Necropolis/JumpBoxes"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 55, -62.2, 10)
+
+[node name="Mesh" type="MeshInstance3D" parent="Necropolis/JumpBoxes/BoxStackB"]
+transform = Transform3D(3.5, 0, 0, 0, 4.0, 0, 0, 0, 3.5, 0, 0, 0)
+material_override = SubResource("Mat_crate")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="Necropolis/JumpBoxes/BoxStackB"]
+transform = Transform3D(3.5, 0, 0, 0, 4.0, 0, 0, 0, 3.5, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+[node name="BoxStackC" type="StaticBody3D" parent="Necropolis/JumpBoxes"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 72, -62.5, -8)
+
+[node name="Mesh" type="MeshInstance3D" parent="Necropolis/JumpBoxes/BoxStackC"]
+transform = Transform3D(3.0, 0, 0, 0, 3.6, 0, 0, 0, 3.0, 0, 0, 0)
+material_override = SubResource("Mat_crate")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="Necropolis/JumpBoxes/BoxStackC"]
+transform = Transform3D(3.0, 0, 0, 0, 3.6, 0, 0, 0, 3.0, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+[node name="BoxStackD" type="StaticBody3D" parent="Necropolis/JumpBoxes"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 48, -62.0, 22)
+
+[node name="Mesh" type="MeshInstance3D" parent="Necropolis/JumpBoxes/BoxStackD"]
+transform = Transform3D(4.0, 0, 0, 0, 4.5, 0, 0, 0, 4.0, 0, 0, 0)
+material_override = SubResource("Mat_crate")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="Necropolis/JumpBoxes/BoxStackD"]
+transform = Transform3D(4.0, 0, 0, 0, 4.5, 0, 0, 0, 4.0, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+[node name="BoxStackE" type="StaticBody3D" parent="Necropolis/JumpBoxes"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 88, -62.4, 12)
+
+[node name="Mesh" type="MeshInstance3D" parent="Necropolis/JumpBoxes/BoxStackE"]
+transform = Transform3D(3.2, 0, 0, 0, 3.8, 0, 0, 0, 3.2, 0, 0, 0)
+material_override = SubResource("Mat_crate")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="Necropolis/JumpBoxes/BoxStackE"]
+transform = Transform3D(3.2, 0, 0, 0, 3.8, 0, 0, 0, 3.2, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+; Stepping stone / low crate near first stack for easier mantle
+[node name="StepA" type="StaticBody3D" parent="Necropolis/JumpBoxes"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 40, -63.6, -9.5)
+
+[node name="Mesh" type="MeshInstance3D" parent="Necropolis/JumpBoxes/StepA"]
+transform = Transform3D(2.0, 0, 0, 0, 1.4, 0, 0, 0, 2.0, 0, 0, 0)
+material_override = SubResource("Mat_crate")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="Necropolis/JumpBoxes/StepA"]
+transform = Transform3D(2.0, 0, 0, 0, 1.4, 0, 0, 0, 2.0, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+[node name="StepB" type="StaticBody3D" parent="Necropolis/JumpBoxes"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 55, -63.5, 13)
+
+[node name="Mesh" type="MeshInstance3D" parent="Necropolis/JumpBoxes/StepB"]
+transform = Transform3D(2.2, 0, 0, 0, 1.5, 0, 0, 0, 2.2, 0, 0, 0)
+material_override = SubResource("Mat_crate")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="Necropolis/JumpBoxes/StepB"]
+transform = Transform3D(2.2, 0, 0, 0, 1.5, 0, 0, 0, 2.2, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+[node name="StepC" type="StaticBody3D" parent="Necropolis/JumpBoxes"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 72, -63.6, -5.5)
+
+[node name="Mesh" type="MeshInstance3D" parent="Necropolis/JumpBoxes/StepC"]
+transform = Transform3D(2.0, 0, 0, 0, 1.4, 0, 0, 0, 2.0, 0, 0, 0)
+material_override = SubResource("Mat_crate")
+mesh = SubResource("Mesh_box")
+
+[node name="Col" type="CollisionShape3D" parent="Necropolis/JumpBoxes/StepC"]
+transform = Transform3D(2.0, 0, 0, 0, 1.4, 0, 0, 0, 2.0, 0, 0, 0)
+shape = SubResource("Shape_unit")
+
+; =============================================================================
+; TWITTER COMMENT KNIGHTS — sword melee (~65 dmg), quote X discourse
+; =============================================================================
+[node name="CommentKnights" type="Node3D" parent="Necropolis"]
+
+[node name="KnightA" parent="Necropolis/CommentKnights" instance=ExtResource("1_knight")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38, -63.8, -6)
+display_name = "Ravenous Verified"
+patrol_half_extent = 6.0
+
+[node name="KnightB" parent="Necropolis/CommentKnights" instance=ExtResource("1_knight")]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 58, -63.8, 6)
+display_name = "Ratio Thrall-Knight"
+patrol_half_extent = 7.0
+max_health = 100.0
+
+[node name="KnightC" parent="Necropolis/CommentKnights" instance=ExtResource("1_knight")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 75, -63.8, -4)
+display_name = "Quote Cleaver"
+patrol_half_extent = 5.5
+chase_speed = 5.6
+
+[node name="KnightD" parent="Necropolis/CommentKnights" instance=ExtResource("1_knight")]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 50, -63.8, 18)
+display_name = "Hot Take Acolyte-Knight"
+patrol_half_extent = 6.5
+sword_damage = 65.0
+
+[node name="KnightE" parent="Necropolis/CommentKnights" instance=ExtResource("1_knight")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 90, -63.8, 8)
+display_name = "Engagement Wizard-Knight"
+patrol_half_extent = 4.5
+max_health = 110.0
+aggro_range = 26.0

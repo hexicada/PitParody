@@ -228,8 +228,8 @@ func _die() -> void:
 	var death_pos := global_position
 	died.emit(death_pos)
 	# Backup notify so boss always gets a drop even if signal connect failed.
-	if is_in_group("board_thrall"):
-		get_tree().call_group("boss", "notify_thrall_killed", death_pos)
+	if is_in_group("board_worm"):
+		get_tree().call_group("boss", "notify_worm_killed", death_pos)
 	# Collapse into the floor comically, then free
 	var tw := create_tween()
 	tw.tween_property(self, "scale", Vector3(1.2, 0.15, 1.2), 0.35)

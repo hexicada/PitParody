@@ -28,7 +28,7 @@ var slide_friction: float
 var slide_cooldown: float
 
 @onready var collision_shape: CollisionShape3D = $CollisionShape3D
-@onready var body_mesh: MeshInstance3D = $BodyMesh
+@onready var body_mesh: Node3D = $WorldBodyRoot
 @onready var head_pivot: Node3D = $HeadPivot
 @onready var camera_controller: PlayerCameraController = $HeadPivot
 @onready var interaction_component: PlayerInteractionComponent = $HeadPivot/InteractionRayCast3D
@@ -38,6 +38,9 @@ var slide_cooldown: float
 @onready var weapon_anchor: WeaponAnchor = $HeadPivot/Camera3D/ViewModelRoot/UpperFP/WeaponAnchor
 @onready var camera_3d: Camera3D = $HeadPivot/Camera3D
 @onready var hud: PlayerHud = $PlayerHud
+
+## Hide world-body head/hair from local FP camera (hybrid: FP arms later under UpperFP).
+@export var hide_world_head_in_fp: bool = true
 
 @export var max_health: float = 300.0
 @export var fire_damage: float = 25.0
@@ -98,10 +101,58 @@ func _ready() -> void:
 	if hud:
 		hud.set_hint("WASD | Mouse | Shift sprint | Space jump | Ctrl crouch | LMB shoot | Q heal | F pick up OKR | dunk on pillars | Esc")
 	combat_bridge.update_from_locomotion_state(_state)
+	_setup_world_body_visuals()
 	_update_okr_hud()
 	_update_heal_hud()
 	_update_health_ui()
 	_update_debug_label()
+
+
+func _setup_world_body_visuals() -> void:
+	if body_mesh == null:
+		return
+	# Play Idle if the GLB imported an AnimationPlayer.
+	var ap := _find_animation_player(body_mesh)
+	if ap:
+		var idle := _find_idle_anim(ap)
+		if idle != "":
+			ap.play(idle)
+	# Hybrid FP: hide head/hair so they never clip the local camera.
+	if hide_world_head_in_fp:
+		_hide_world_head_meshes(body_mesh)
+
+
+func _find_idle_anim(ap: AnimationPlayer) -> String:
+	for name in ap.get_animation_list():
+		var n := String(name)
+		if n.to_lower().contains("idle"):
+			return n
+	var list := ap.get_animation_list()
+	return String(list[0]) if list.size() > 0 else ""
+
+
+func _hide_world_head_meshes(root: Node) -> void:
+	# Only hide explicit Head_FP_Hide markers (Blender hybrid exports).
+	# Single-mesh bases (e.g. CesiumMan) have no separate head — leave visible.
+	_hide_head_subtree(root)
+
+
+func _hide_head_subtree(node: Node) -> void:
+	if node.name.to_lower().contains("head_fp_hide"):
+		node.visible = false
+		return
+	for c in node.get_children():
+		_hide_head_subtree(c)
+
+
+func _find_animation_player(root: Node) -> AnimationPlayer:
+	if root is AnimationPlayer:
+		return root as AnimationPlayer
+	for c in root.get_children():
+		var found := _find_animation_player(c)
+		if found:
+			return found
+	return null
 
 
 func _apply_movement_profile() -> void:
@@ -544,7 +595,11 @@ func _apply_crouch_pose(alpha: float) -> void:
 	var new_height: float = lerpf(standing_capsule_height, crouched_capsule_height, alpha)
 	capsule.height = new_height
 	collision_shape.position.y = new_height * 0.5
-	body_mesh.position.y = collision_shape.position.y
+	# Keep world body feet planted. Do not squash skinned meshes (looks broken).
+	# Crouch animation can drive WorldBodyRoot later.
+	if body_mesh:
+		body_mesh.position.y = 0.0
+		body_mesh.scale = Vector3.ONE
 
 
 func _can_stand_up() -> bool:

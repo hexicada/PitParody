@@ -8,17 +8,11 @@
 [ext_resource type="PackedScene" path="res://res/actors/player/weapon_placeholder.tscn" id="5_xn2gg"]
 [ext_resource type="Resource" path="res://res/actors/player/player_movement_profile_default.tres" id="5_xsgd0"]
 [ext_resource type="PackedScene" path="res://res/actors/player/player_hud.tscn" id="6_hud"]
+[ext_resource type="PackedScene" uid="uid://15463hk1kjom" path="res://res/assets/characters/player/guardian_body.glb" id="7_body"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_2v2rf"]
 radius = 0.35
 height = 1.8
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_jm2ki"]
-albedo_color = Color(0.227451, 0.356863, 0.619608, 1)
-roughness = 0.72
-
-[sub_resource type="CapsuleMesh" id="CapsuleMesh_x5jlt"]
-radius = 0.35
 
 [node name="Player" type="CharacterBody3D" unique_id=579228476]
 collision_layer = 1
@@ -30,11 +24,6 @@ movement_profile = ExtResource("5_xsgd0")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1174611935]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
 shape = SubResource("CapsuleShape3D_2v2rf")
-
-[node name="BodyMesh" type="MeshInstance3D" parent="." unique_id=1161388759]
-transform = Transform3D(1, 0, 0, 0, 0.99980825, -0.019581342, 0, 0.019581342, 0.99980825, 0, 0.9, 0)
-material_override = SubResource("StandardMaterial3D_jm2ki")
-mesh = SubResource("CapsuleMesh_x5jlt")
 
 [node name="HeadPivot" type="Node3D" parent="." unique_id=492834533]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
@@ -76,8 +65,12 @@ target_position = Vector3(0, 0, -1.5)
 [node name="PlayerHud" parent="." instance=ExtResource("6_hud")]
 
 [node name="WorldBodyRoot" type="Node3D" parent="." unique_id=48881412]
-editor_description = "Placeholder for the full world character rig (male/female bodies, shadows, third-person visibility, multiplayer).
-   Both FP layers and this root must eventually be driven by the same locomotion states."
+editor_description = "World character mesh — Destiny-inspired Guardian (Hunter silhouette).
+   Head_FP_Hide hidden in local FP. Collision stays on capsule."
+
+[node name="GuardianBody" parent="WorldBodyRoot" unique_id=1900200001 instance=ExtResource("7_body")]
+; CesiumMan faces +Z in the sample; player forward is -Z — 180° Y so look-down shows the front.
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0, 0)
 
 [node name="CombatBridge" type="Node" parent="." unique_id=178670848]
 editor_description = "Logic mediator. Controller will push locomotion state here.

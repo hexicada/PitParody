@@ -7,50 +7,47 @@ A short, silly **Destiny dungeon parody** built as a fork of the [Fate](https://
 
 ## What this is
 
-- **Fan parody / joke game** — not affiliated with Bungie, Destiny, PlayStation, or any real executive, studio, or corporation.
-- **Sibling project to Fate** — Fate remains the more serious title; this repo is where the live-service heresy lives.
+- **Fan parody / joke game** — not affiliated with Bungie, Destiny, PlayStation, or any real executive.
+- **Sibling to Fate** — Fate stays serious; this repo is the live-service heresy.
 - **Engine:** Godot 4.6
-- **Boss:** **The Instrument** — an abstract *thoughtform of the portfolio* (not a depiction of any real person).
+- **Boss:** **The Instrument** — abstract thoughtform of the portfolio.
 
 ## Relationship to Fate
 
 | Repo | Role |
 |------|------|
 | `Fate` | Serious game development |
-| `PitOfHulst` / [PitParody](https://github.com/hexicada/PitParody) | Parody dungeon spoof |
+| `PitOfHulst` / [PitParody](https://github.com/hexicada/PitParody) | Parody dungeon |
 
-Optional remote: `upstream` → `https://github.com/hexicada/Fate.git` for cherry-picking controller/engine fixes. Do **not** merge this project back into Fate.
+Optional: `upstream` → Fate for cherry-picks only. Never push parody into Fate.
 
 ## Open in Godot
 
-1. Open Godot 4.6  
-2. Import / open this folder  
-3. Main scene: `res/levels/pit_of_hulst.tscn`  
+1. Godot 4.6 → open this folder  
+2. Main scene: `res/levels/pit_of_hulst.tscn`  
+3. Or `open_project.bat`
 
-Or use `open_project.bat` if present.
+## Playable path
 
-## Status
+1. **Entry yard** — overlook, rim, pit, cliff “org chart”  
+2. **Shaft** → further drop → vestibule  
+3. **Necropolis** — hive cavern, door wall, Hive Comment Knights  
+4. **Shareholder Hall** — worms  
+5. **Boss** — The Instrument (shield → kill worms → dunk OKRs)
 
-**Playable day-one loop + release-safer boss:**
+**Boss loop:** DPS → shield → kill worms → **F** pick up Voltaic OKR → dunk pillars → shield drops → repeat.
 
-1. **Entry yard** — moon surface, central pit, comedy signage  
-2. **Worm cave** — Board Thrall / roadmap fauna (shootable)  
-3. **Boss room** — **The Instrument** (faceless thoughtform)
-
-**Boss (Zulmak-shaped):**
-- 3 DPS phases  
-- White mist shield + **Immune!**  
-- Kill thrall → **F** pick up **Voltaic OKR** (one at a time) → dunk on **Pillars of Engagement**  
-- Shield drops → repeat  
-
-Path: spawn → fall the shaft → cave → ritual DPS the thoughtform.
-
-## Project layout (short)
+## Layout (short)
 
 | Path | Role |
 |------|------|
-| `res/actors/player/` | Controller + `player_hud.tscn` + weapon |
-| `res/actors/bosses/instrument/` | Boss, pillars, OKR motes |
-| `res/actors/enemies/worm/` | Cave thrall / boss adds |
+| `res/actors/player/` | Controller, HUD, weapon |
+| `res/actors/enemies/` | Worms, Hive Comment Knights |
+| `res/actors/bosses/instrument/` | Boss, pillars, OKRs |
 | `res/levels/pit_of_hulst.tscn` | Main dungeon |
-| `HANDOFF.md` | Design lock + maintainability notes for agents/humans |
+| `res/levels/parts/` | Modular entry / shaft / necropolis |
+| `HANDOFF.md` | Agent/human design lock |
+
+## Credits / third-party
+
+Player world body may use **CesiumMan** (Apache 2.0) — see `res/assets/characters/player/THIRD_PARTY_CREDITS.md`.

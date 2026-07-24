@@ -1,7 +1,7 @@
 [gd_scene load_steps=16 format=3]
 
 [ext_resource type="Script" path="res://res/actors/bosses/instrument/instrument_boss.gd" id="1_boss"]
-[ext_resource type="PackedScene" path="res://res/actors/enemies/worm/worm.tscn" id="2_thrall"]
+[ext_resource type="PackedScene" path="res://res/actors/enemies/worm/worm.tscn" id="2_worm"]
 [ext_resource type="PackedScene" path="res://res/actors/bosses/instrument/voltaic_okr.tscn" id="3_okr"]
 [ext_resource type="PackedScene" path="res://res/actors/bosses/instrument/engagement_pillar.tscn" id="4_pillar"]
 
@@ -61,7 +61,7 @@ radial_segments = 12
 collision_layer = 2
 collision_mask = 0
 script = ExtResource("1_boss")
-thrall_scene = ExtResource("2_thrall")
+worm_scene = ExtResource("2_worm")
 okr_scene = ExtResource("3_okr")
 pillar_scene = ExtResource("4_pillar")
 

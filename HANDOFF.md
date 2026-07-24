@@ -11,17 +11,9 @@ Workspace: `C:\Users\hexicada\Projects\PitOfHulst`
 |--|--|
 | **Title** | Pit of Hulst: Heresy of the Live Service |
 | **Engine** | Godot **4.6** |
-| **Genre** | Short Destiny *Pit of Heresy* parody FPS (Vault of Cars energy, more structured) |
-| **Tone** | Affectionate roast + corporate cosmic horror (live service as dark religion) |
+| **Genre** | Short Destiny *Pit of Heresy* parody FPS |
+| **Tone** | Affectionate roast + corporate cosmic horror |
 | **Legal** | Fan parody — **not** affiliated with Bungie / Destiny / PlayStation. **No real-person likenesses.** |
-
-### Projects
-
-| Path | Role |
-|------|------|
-| `Fate` | Serious Godot FPS — leave alone |
-| `PitOfHulst` (this) | Joke dungeon — all work here |
-| GitHub `hexicada/PitParody` | `origin` remote |
 
 ### Remotes
 
@@ -33,103 +25,81 @@ Workspace: `C:\Users\hexicada\Projects\PitOfHulst`
 ## Playable flow (current)
 
 ```text
-[1] ENTRY YARD     overlook spawn → broken bridge / rim walk
-                   wall-of-doors gag, cliff "org chart" towers, central pit
-        ↓ fall shaft (cross ledges + side platforms, sealed warrens)
-[2] WORM CAVE      Board Thrall / roadmap fauna (no jump puzzle)
+[1] ENTRY YARD       overlook spawn → rim → pit; cliff towers; Earth + spire
+        ↓ shaft (ledges, sealed warrens)
+[2] FURTHER DROP     rim hole → vestibule
         ↓
-[3] BOSS ROOM      The Instrument (thoughtform) — Zulmak-shaped fight
+[3] NECROPOLIS       large hive cavern, hive towers, wall of doors
+                     Hive Comment Knights (sword ~65 dmg) + jump crates
+                     correct door = lower yellow-lit entrance
+        ↓
+[4] ANTECHAMBER      short room past correct door
+        ↓
+[5] SHAREHOLDER HALL worms / roadmap fauna
+        ↓
+[6] BOSS ROOM        The Instrument (Zulmak-shaped OKR dunk fight)
 ```
 
-**PoH homage notes (entry/pit):** modular parts under `res/levels/parts/`  
-(`entry_poh_homage.tscn`, `shaft_poh_homage.tscn`) — cliff towers, rim approach, door wall, side ledges.
+**Boss:** Exposed → Shielded (kill **board_worm** adds → **F** pick up Voltaic OKR → dunk pillars) → repeat ×3.
 
-**Boss (The Instrument):**
-
-1. **Exposed** — shoot boss (damage numbers)  
-2. **Shielded** — white mist, **Immune!** if shot  
-3. Kill **Board Thrall** → **Voltaic OKR** drops  
-4. **F** pick up OKR (one at a time) → walk into **Pillar of Engagement** to dunk  
-5. All pillars charged → **SHIELD DOWN** → next phase (×3 total DPS windows)
+**Level parts:** `res/levels/parts/entry_poh_homage.tscn`, `shaft_poh_homage.tscn`, `necropolis_poh_homage.tscn`
 
 ---
 
-## Architecture map (keep this shape)
+## Architecture
 
 ```text
 res/
   actors/
-    player/          # controller, HUD scene, weapon viewmodel
-    enemies/worm/    # thrall (also used as boss adds)
-    bosses/instrument/  # InstrumentBoss, pillars, OKRs
-    fx/              # DamageNumber floating text
+    player/                 # controller, HUD, weapon viewmodel
+    enemies/worm/           # cave + boss-add worms (not thralls)
+    enemies/twitter_knight/ # Hive Comment Knights (necropolis)
+    bosses/instrument/      # InstrumentBoss, pillars, OKRs
+    fx/                     # DamageNumber
+  assets/
+    characters/player/      # world body GLB (CesiumMan for now)
+    skyboxes/ shaders/
   levels/
-    pit_of_hulst.tscn   # main dungeon (single scene for now)
-    test_arena.tscn     # legacy sandbox
-  assets/            # textures, sky
-control_scheme_manager.gd   # autoload input schemes
+    pit_of_hulst.tscn       # main dungeon
+    parts/                  # modular homage chunks
+docs/
+  ref/                      # mood reference images
+  hybrid_fp_arms_plan.md    # queued FP arms plan
+tools/blender/              # experimental mesh scripts (not used in-game)
 ```
 
-### Important scripts
+### Contracts
 
-| Script | Responsibility |
-|--------|----------------|
-| `player_controller.gd` | Locomotion + combat input + health/heal + OKR carry |
-| `player_hud.gd` / `.tscn` | **All** player chrome (health bar, death, crosshair, status) |
-| `instrument_boss.gd` | Boss phases, shield, thrall spawn, OKR drops, pillars |
-| `voltaic_okr.gd` | Mote pickup (**F** / `interact`) |
-| `engagement_pillar.gd` | Dunk zone |
-| `worm.gd` | Thrall AI, contact damage, `died` signal |
-| `damage_number.gd` | World-space floating text |
+- **Player** group `player`: `take_damage`, `heal`, `give_okr` / `has_okr` / `consume_okr` / `clear_okr`, `notify_kill`
+- **Boss** group `boss`; shield adds group **`board_worm`**
+- **OKRs** group `voltaic_okr`
+- **Damageable** targets implement `take_damage(amount, from)`
+- **HUD** only via `PlayerHud` API
 
-### Contracts (do not break casually)
+### Player presentation (hybrid, WIP)
 
-- **Player** is in group `player`; exposes `take_damage`, `heal`, `give_okr` / `has_okr` / `consume_okr` / `clear_okr`, `notify_kill`.
-- **Boss** is in group `boss`; thrall adds use group `board_thrall`.
-- **OKRs** are in group `voltaic_okr`.
-- **Damageable** combat targets implement `take_damage(amount, from)`.
-- **HUD**: controller talks only through `PlayerHud` API — do not re-scatter UI nodes under Player.
+| Layer | Location | Status |
+|-------|----------|--------|
+| Collision | Capsule on Player | Source of truth |
+| World body | `WorldBodyRoot/GuardianBody` | CesiumMan GLB (Apache 2.0) — temporary |
+| FP weapon | `ViewModelRoot/UpperFP/WeaponAnchor` | Placeholder gun |
+| FP arms | `UpperFP` | **Not built** — see `docs/hybrid_fp_arms_plan.md` |
+| 3rd person cam | — | **Not built** |
 
 ---
 
-## Maintainability standards (project rules)
+## Next work (priority)
 
-1. **Fate isolation** — no edits under `Projects/Fate` for this game.  
-2. **No real likenesses** — abstract / parody only (The Instrument, not named execs).  
-3. **Single main scene is OK for now** — `pit_of_hulst.tscn` is large; split later if editing becomes painful (entry / shaft / cave / boss instances).  
-4. **Prefer small scenes for entities** — boss parts already split (`instrument_boss`, `voltaic_okr`, `engagement_pillar`, `worm`, `player_hud`).  
-5. **Magic numbers** live as `@export` on the owning script when tunable (heal CD, phase HP, thrall counts).  
-6. **Input** via named actions (`ult`, `interact`, move/*, etc.) + `ControlSchemeManager`; fallbacks in `player_controller._ensure_default_input_actions`.  
-7. **Docs** — update this file when flow, boss rules, or remotes change. README is the public blurb.  
-8. **Commits** — ship playable slices; don’t leave multi-day WIP unpushed to `origin`.  
-9. **Ignore** noisy `*.import` line-ending churn unless import settings actually changed.
-
-### Known debt (acceptable for short parody scope)
-
-| Item | Notes |
-|------|--------|
-| `player_controller.gd` ~600+ lines | Locomotion + combat + heal + OKR in one file; split only if it hurts |
-| `pit_of_hulst.tscn` ~780 lines | Monolithic level; CSG blockout is intentional |
-| `docs/hybrid_player_body_spec.md` | Fate-era; not active for this parody |
-| No automated tests | Manual playtest is the bar |
-| Soft thrall respawn during shield | Prevents soft-lock if OKRs/thrall depleted before pillars filled |
-
----
-
-## Next work (when un-parking)
-
-Pick one:
-
-1. Iron-out: pillar positions, thrall spawn floors, shield readability  
-2. Win / dungeon-complete screen after Instrument dies  
-3. Comedy pass (signs, thrall names, death lines)  
-4. Optional Chamber-lite plate before boss door  
-5. Split level into instanced area scenes if CSG edits thrash git  
+1. **Weapon anchor retune** for current body + camera  
+2. **Third-person camera** toggle  
+3. Optional: replace body with KayKit Knight (CC0) — see `res/assets/characters/player/README.md`  
+4. Hybrid FP arms (`docs/hybrid_fp_arms_plan.md`)  
+5. Win screen / comedy polish / iron-out necropolis combat  
 
 ---
 
 ## Open in Godot
 
-1. Godot 4.6 → open this folder  
+1. Godot 4.6 → this folder  
 2. Main scene: `res://res/levels/pit_of_hulst.tscn`  
 3. Or `open_project.bat`
