@@ -43,6 +43,7 @@ var slide_cooldown: float
 @export var hide_world_head_in_fp: bool = true
 
 @export var max_health: float = 300.0
+## Fallback stats if no WeaponDef is equipped (mirrors The Feedback Loop).
 @export var fire_damage: float = 25.0
 @export var fire_range: float = 55.0
 @export var fire_cooldown: float = 0.14
@@ -81,6 +82,9 @@ var _camera_punch: float = 0.0
 var _holding_okr: bool = false
 var _heal_cd: float = 0.0
 var _time_since_damage: float = 999.0
+var _weapons: Array[WeaponDef] = []
+var _weapon_index: int = 0
+var _current_weapon: WeaponDef = null
 
 
 func _ready() -> void:
@@ -99,9 +103,10 @@ func _ready() -> void:
 	_spawn_yaw = rotation.y
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	if hud:
-		hud.set_hint("WASD | Mouse | Shift sprint | Space jump | Ctrl crouch | LMB shoot | Q heal | F pick up OKR | dunk on pillars | Esc")
+		hud.set_hint("WASD | Mouse | Shift sprint | Space jump | Ctrl crouch | LMB shoot | 1-5 / wheel weapons | Q heal | F OKR | Esc")
 	combat_bridge.update_from_locomotion_state(_state)
 	_setup_world_body_visuals()
+	_init_weapons()
 	_update_okr_hud()
 	_update_heal_hud()
 	_update_health_ui()
@@ -217,6 +222,10 @@ func _input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 		return
 
+	if _handle_weapon_switch_input(event):
+		get_viewport().set_input_as_handled()
+		return
+
 	if event is InputEventMouseMotion:
 		camera_controller.handle_input(event, self)
 		get_viewport().set_input_as_handled()
@@ -314,12 +323,126 @@ func _update_heal_hud() -> void:
 		hud.set_heal_status(_heal_cd <= 0.0, _heal_cd)
 
 
+func _init_weapons() -> void:
+	_weapons = WeaponCatalog.all_weapons()
+	_weapon_index = 0
+	_equip_weapon(_weapon_index, false)
+
+
+func _current_weapon_name() -> String:
+	if _current_weapon:
+		return _current_weapon.display_name
+	return "The Feedback Loop"
+
+
+func _get_fire_damage() -> float:
+	return _current_weapon.damage if _current_weapon else fire_damage
+
+
+func _get_fire_range() -> float:
+	return _current_weapon.fire_range if _current_weapon else fire_range
+
+
+func _get_fire_cooldown() -> float:
+	return _current_weapon.fire_cooldown if _current_weapon else fire_cooldown
+
+
+func _get_pellet_count() -> int:
+	if _current_weapon:
+		return maxi(_current_weapon.pellet_count, 1)
+	return 1
+
+
+func _get_spread_deg() -> float:
+	return _current_weapon.spread_deg if _current_weapon else 0.0
+
+
+func _handle_weapon_switch_input(event: InputEvent) -> bool:
+	if event is InputEventKey and event.pressed and not event.echo:
+		var key: Key = event.keycode
+		if key >= KEY_1 and key <= KEY_5:
+			_equip_weapon(int(key) - int(KEY_1), true)
+			return true
+		if key >= KEY_KP_1 and key <= KEY_KP_5:
+			_equip_weapon(int(key) - int(KEY_KP_1), true)
+			return true
+
+	if event is InputEventMouseButton and event.pressed:
+		if event.button_index == MOUSE_BUTTON_WHEEL_UP:
+			_cycle_weapon(-1)
+			return true
+		if event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+			_cycle_weapon(1)
+			return true
+
+	if event.is_action_pressed("switch_weapon"):
+		# Tab / pad shoulder: cycle forward (wheel handled above for direction).
+		if not (event is InputEventMouseButton):
+			_cycle_weapon(1)
+			return true
+
+	return false
+
+
+func _cycle_weapon(step: int) -> void:
+	if _weapons.is_empty():
+		return
+	var next := posmod(_weapon_index + step, _weapons.size())
+	_equip_weapon(next, true)
+
+
+func _equip_weapon(index: int, announce: bool) -> void:
+	if _weapons.is_empty():
+		return
+	_weapon_index = posmod(index, _weapons.size())
+	_current_weapon = _weapons[_weapon_index]
+	# Sync fallback exports so anything reading them still matches.
+	fire_damage = _current_weapon.damage
+	fire_cooldown = _current_weapon.fire_cooldown
+	fire_range = _current_weapon.fire_range
+	# Don't carry heavy/scout cooldown into a freshly equipped SMG/AR.
+	_fire_cd = 0.0
+	_apply_weapon_to_view_model(_current_weapon)
+	if announce:
+		var tag := _current_weapon.hud_tag
+		if tag != "":
+			_set_weapon_hud("%s [%s]  ·  equipped (%d/%d)" % [
+				_current_weapon.display_name, tag, _weapon_index + 1, _weapons.size()
+			])
+		else:
+			_set_weapon_hud("%s  ·  equipped (%d/%d)" % [
+				_current_weapon.display_name, _weapon_index + 1, _weapons.size()
+			])
+	else:
+		_set_weapon_hud("%s  ·  ready" % _current_weapon.display_name)
+
+
+func _apply_weapon_to_view_model(def: WeaponDef) -> void:
+	if weapon_anchor == null or def == null:
+		return
+	var gun := weapon_anchor.get_active_view_model()
+	if gun and gun.has_method("apply_weapon_def"):
+		gun.call("apply_weapon_def", def)
+		return
+	for child in weapon_anchor.get_children():
+		if child.has_method("apply_weapon_def"):
+			child.call("apply_weapon_def", def)
+			return
+
+
 func _try_fire() -> void:
 	if _is_dead or _fire_cd > 0.0:
 		return
 	if combat_bridge and combat_bridge.readiness == PlayerCombatBridge.WeaponReadiness.SLIDE:
 		return
-	_fire_cd = fire_cooldown
+	var cd := _get_fire_cooldown()
+	var dmg := _get_fire_damage()
+	var rng := _get_fire_range()
+	var pellets := _get_pellet_count()
+	var spread := _get_spread_deg()
+	var wname := _current_weapon_name()
+
+	_fire_cd = cd
 	_camera_punch = minf(_camera_punch + 0.035, 0.12)
 
 	var gun := weapon_anchor.get_active_view_model() if weapon_anchor else null
@@ -333,28 +456,62 @@ func _try_fire() -> void:
 
 	if camera_3d == null:
 		return
+
 	var from := camera_3d.global_position
 	var aim := -camera_3d.global_transform.basis.z
-	var to := from + aim * fire_range
-	var query := PhysicsRayQueryParameters3D.create(from, to)
-	query.collide_with_areas = false
-	query.collide_with_bodies = true
-	query.exclude = [get_rid()]
-	query.collision_mask = 0xFFFFFFFF
-	var hit := get_world_3d().direct_space_state.intersect_ray(query)
-	if hit.is_empty():
-		_set_weapon_hud("The Feedback Loop  ·  missed (no alignment)")
-		return
-	var node: Node = hit.get("collider") as Node
-	while node:
-		if node != self and node.has_method("take_damage"):
-			node.call("take_damage", fire_damage, self)
-			_show_hit_marker()
-			var victim_name := _killer_name(node)
-			_set_weapon_hud("The Feedback Loop  ·  hit %s" % victim_name)
-			return
-		node = node.get_parent()
-	_set_weapon_hud("The Feedback Loop  ·  terrain (out of scope)")
+	var space := get_world_3d().direct_space_state
+	var hits := 0
+	var last_victim := ""
+	var hit_terrain := false
+
+	for _i in range(pellets):
+		var dir := _spread_direction(aim, spread)
+		var to := from + dir * rng
+		var query := PhysicsRayQueryParameters3D.create(from, to)
+		query.collide_with_areas = false
+		query.collide_with_bodies = true
+		query.exclude = [get_rid()]
+		query.collision_mask = 0xFFFFFFFF
+		var hit := space.intersect_ray(query)
+		if hit.is_empty():
+			continue
+		var node: Node = hit.get("collider") as Node
+		var damaged := false
+		while node:
+			if node != self and node.has_method("take_damage"):
+				node.call("take_damage", dmg, self)
+				hits += 1
+				last_victim = _killer_name(node)
+				damaged = true
+				break
+			node = node.get_parent()
+		if not damaged:
+			hit_terrain = true
+
+	if hits > 0:
+		_show_hit_marker()
+		if pellets > 1:
+			_set_weapon_hud("%s  ·  hit %s ×%d" % [wname, last_victim, hits])
+		else:
+			_set_weapon_hud("%s  ·  hit %s" % [wname, last_victim])
+	elif hit_terrain:
+		_set_weapon_hud("%s  ·  terrain (out of scope)" % wname)
+	else:
+		_set_weapon_hud("%s  ·  missed (no alignment)" % wname)
+
+
+func _spread_direction(aim: Vector3, spread_deg: float) -> Vector3:
+	if spread_deg <= 0.001:
+		return aim.normalized()
+	# Random cone offset around aim axis.
+	var forward := aim.normalized()
+	var up := Vector3.UP
+	if absf(forward.dot(up)) > 0.95:
+		up = Vector3.RIGHT
+	var basis := Basis.looking_at(forward, up)
+	var yaw := deg_to_rad(randf_range(-spread_deg, spread_deg))
+	var pitch := deg_to_rad(randf_range(-spread_deg, spread_deg))
+	return (basis * Vector3(tan(yaw), tan(pitch), -1.0)).normalized()
 
 
 func _begin_death(from: Node = null) -> void:
@@ -383,7 +540,7 @@ func _finish_respawn() -> void:
 	_crouch_alpha = 0.0
 	_apply_crouch_pose(0.0)
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
-	_set_weapon_hud("The Feedback Loop  ·  re-engaged")
+	_set_weapon_hud("%s  ·  re-engaged" % _current_weapon_name())
 	_update_okr_hud()
 	_update_heal_hud()
 	_update_debug_label()
@@ -880,6 +1037,7 @@ func _ensure_default_input_actions() -> void:
 	_ensure_action_with_key("crouch", KEY_CTRL)
 	_ensure_action_with_key("ult", KEY_Q)
 	_ensure_action_with_key("interact", KEY_F)
+	_ensure_action_with_key("switch_weapon", KEY_TAB)
 
 
 func _ensure_action_with_key(action_name: StringName, keycode: Key) -> void:

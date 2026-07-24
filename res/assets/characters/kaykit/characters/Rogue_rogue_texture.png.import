@@ -2,16 +2,19 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b31mrbcx3ri0g"
-path="res://.godot/imported/cursed_thrall_reference.jpg-2b9f3f8f55713e2de0167ad3b8b1dbe5.ctex"
+uid="uid://witw2vbryhuj"
+path="res://.godot/imported/Rogue_rogue_texture.png-7fcf748dc4930f7d0c7edcc028204ae3.ctex"
 metadata={
 "vram_texture": false
+}
+generator_parameters={
+"md5": "5b6fbb4d6c67e8c66dd2dffbb40f8812"
 }
 
 [deps]
 
-source_file="res://docs/ref/cursed_thrall_reference.jpg"
-dest_files=["res://.godot/imported/cursed_thrall_reference.jpg-2b9f3f8f55713e2de0167ad3b8b1dbe5.ctex"]
+source_file="res://res/assets/characters/kaykit/characters/Rogue_rogue_texture.png"
+dest_files=["res://.godot/imported/Rogue_rogue_texture.png-7fcf748dc4930f7d0c7edcc028204ae3.ctex"]
 
 [params]
 
@@ -23,7 +26,7 @@ compress/rdo_quality_loss=0.0
 compress/hdr_compression=1
 compress/normal_map=0
 compress/channel_pack=0
-mipmaps/generate=false
+mipmaps/generate=true
 mipmaps/limit=-1
 roughness/mode=0
 roughness/src_normal=""

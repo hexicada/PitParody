@@ -1,0 +1,10 @@
+KayKit Character Pack — Adventures
+Author: Kay Lousberg
+License: CC0 1.0 Universal (public domain)
+https://kaylousberg.itch.io/kaykit-adventurers
+Mirror used: https://github.com/KayKit-Game-Assets/KayKit-Character-Pack-Adventures-1.0
+
+Used for:
+- Player world body (Knight.glb)
+- Hive Comment Knight variants (Knight / Rogue / Barbarian)
+- One-handed sword prop on knights

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b31mrbcx3ri0g"
-path="res://.godot/imported/cursed_thrall_reference.jpg-2b9f3f8f55713e2de0167ad3b8b1dbe5.ctex"
+uid="uid://b1s88p00bqdjk"
+path="res://.godot/imported/rogue_texture.png-8351b5f786c72178d6f67e49c50ce841.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://docs/ref/cursed_thrall_reference.jpg"
-dest_files=["res://.godot/imported/cursed_thrall_reference.jpg-2b9f3f8f55713e2de0167ad3b8b1dbe5.ctex"]
+source_file="res://res/assets/characters/kaykit/characters/rogue_texture.png"
+dest_files=["res://.godot/imported/rogue_texture.png-8351b5f786c72178d6f67e49c50ce841.ctex"]
 
 [params]
 

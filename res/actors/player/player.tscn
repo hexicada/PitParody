@@ -8,7 +8,7 @@
 [ext_resource type="PackedScene" path="res://res/actors/player/weapon_placeholder.tscn" id="5_xn2gg"]
 [ext_resource type="Resource" path="res://res/actors/player/player_movement_profile_default.tres" id="5_xsgd0"]
 [ext_resource type="PackedScene" path="res://res/actors/player/player_hud.tscn" id="6_hud"]
-[ext_resource type="PackedScene" uid="uid://15463hk1kjom" path="res://res/assets/characters/player/guardian_body.glb" id="7_body"]
+[ext_resource type="PackedScene" path="res://res/assets/characters/kaykit/characters/Knight.glb" id="7_body"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_2v2rf"]
 radius = 0.35
@@ -41,9 +41,9 @@ editor_description = "Weapon positioning anchor (hip vs lowered/ADS).
    Attach a weapon view model (or the placeholder) as a direct child.
    Will be driven by CombatBridge readiness."
 script = ExtResource("4_rjkmk")
-hip_position = Vector3(0.08, -0.15, -0.35)
-ads_position = Vector3(0, -0.08, -0.42)
-ads_rotation_degrees = Vector3(-4, 0, 0)
+hip_position = Vector3(0.22, -0.22, -0.38)
+ads_position = Vector3(0.02, -0.12, -0.45)
+ads_rotation_degrees = Vector3(-6, 2, 0)
 
 [node name="WeaponPlaceholder" parent="HeadPivot/Camera3D/ViewModelRoot/UpperFP/WeaponAnchor" unique_id=1828600232 instance=ExtResource("5_xn2gg")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.034396768, -0.08321679, -0.09846187)
@@ -65,11 +65,10 @@ target_position = Vector3(0, 0, -1.5)
 [node name="PlayerHud" parent="." instance=ExtResource("6_hud")]
 
 [node name="WorldBodyRoot" type="Node3D" parent="." unique_id=48881412]
-editor_description = "World character mesh — Destiny-inspired Guardian (Hunter silhouette).
-   Head_FP_Hide hidden in local FP. Collision stays on capsule."
+editor_description = "World body: KayKit Knight (CC0). Collision stays on capsule."
 
 [node name="GuardianBody" parent="WorldBodyRoot" unique_id=1900200001 instance=ExtResource("7_body")]
-; CesiumMan faces +Z in the sample; player forward is -Z — 180° Y so look-down shows the front.
+; KayKit often faces +Z; flip 180° Y so front matches player forward (-Z). Scale ~1 for 1.8m capsule.
 transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0, 0)
 
 [node name="CombatBridge" type="Node" parent="." unique_id=178670848]

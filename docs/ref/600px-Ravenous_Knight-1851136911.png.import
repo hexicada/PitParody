@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://cj45n4y6wkv18"
-path="res://.godot/imported/600px-Ravenous_Knight-1851136911.png-1d9edb345c2c1dfc06f911a200582192.ctex"
+path="res://.godot/imported/600px-Ravenous_Knight-1851136911.png-5ef17b1b854a290e11c325e953669fd9.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://600px-Ravenous_Knight-1851136911.png"
-dest_files=["res://.godot/imported/600px-Ravenous_Knight-1851136911.png-1d9edb345c2c1dfc06f911a200582192.ctex"]
+source_file="res://docs/ref/600px-Ravenous_Knight-1851136911.png"
+dest_files=["res://.godot/imported/600px-Ravenous_Knight-1851136911.png-5ef17b1b854a290e11c325e953669fd9.ctex"]
 
 [params]
 

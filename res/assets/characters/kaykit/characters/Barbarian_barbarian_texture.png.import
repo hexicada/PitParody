@@ -2,16 +2,19 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b31mrbcx3ri0g"
-path="res://.godot/imported/cursed_thrall_reference.jpg-2b9f3f8f55713e2de0167ad3b8b1dbe5.ctex"
+uid="uid://butsvt4w7mqls"
+path="res://.godot/imported/Barbarian_barbarian_texture.png-b5e13a24b008073dd808848a519d8b64.ctex"
 metadata={
 "vram_texture": false
+}
+generator_parameters={
+"md5": "267533c91145eeae53d251a78b53814c"
 }
 
 [deps]
 
-source_file="res://docs/ref/cursed_thrall_reference.jpg"
-dest_files=["res://.godot/imported/cursed_thrall_reference.jpg-2b9f3f8f55713e2de0167ad3b8b1dbe5.ctex"]
+source_file="res://res/assets/characters/kaykit/characters/Barbarian_barbarian_texture.png"
+dest_files=["res://.godot/imported/Barbarian_barbarian_texture.png-b5e13a24b008073dd808848a519d8b64.ctex"]
 
 [params]
 
@@ -23,7 +26,7 @@ compress/rdo_quality_loss=0.0
 compress/hdr_compression=1
 compress/normal_map=0
 compress/channel_pack=0
-mipmaps/generate=false
+mipmaps/generate=true
 mipmaps/limit=-1
 roughness/mode=0
 roughness/src_normal=""

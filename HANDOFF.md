@@ -81,20 +81,30 @@ tools/blender/              # experimental mesh scripts (not used in-game)
 | Layer | Location | Status |
 |-------|----------|--------|
 | Collision | Capsule on Player | Source of truth |
-| World body | `WorldBodyRoot/GuardianBody` | CesiumMan GLB (Apache 2.0) — temporary |
-| FP weapon | `ViewModelRoot/UpperFP/WeaponAnchor` | Placeholder gun |
-| FP arms | `UpperFP` | **Not built** — see `docs/hybrid_fp_arms_plan.md` |
+| World body | `WorldBodyRoot/GuardianBody` | **KayKit Knight** (CC0) |
+| FP weapon | `WeaponAnchor` + loadout | **5 weapons** (1–5 / wheel / Tab) |
+| Necropolis adds | Hive Comment Knights | KayKit knight/rogue/barbarian + hive tint |
+| FP arms | `UpperFP` | **Not built** — `docs/hybrid_fp_arms_plan.md` |
 | 3rd person cam | — | **Not built** |
+
+### Weapon loadout (all unlocked)
+
+| Key | Name | Role |
+|-----|------|------|
+| 1 | The Feedback Loop | AR |
+| 2 | Scope Creep | Scout / sniper |
+| 3 | Stakeholder Shotgun | Pellets |
+| 4 | Ping of Shame | SMG |
+| 5 | Quarterly Review | Heavy |
 
 ---
 
 ## Next work (priority)
 
-1. **Weapon anchor retune** for current body + camera  
-2. **Third-person camera** toggle  
-3. Optional: replace body with KayKit Knight (CC0) — see `res/assets/characters/player/README.md`  
-4. Hybrid FP arms (`docs/hybrid_fp_arms_plan.md`)  
-5. Win screen / comedy polish / iron-out necropolis combat  
+1. **Third-person camera** toggle (show off KayKit body)  
+2. Hybrid **FP arms** (`docs/hybrid_fp_arms_plan.md`)  
+3. Fine-tune weapon hip poses / knight facing if needed  
+4. Win screen / comedy polish / iron-out necropolis combat  
 
 ---
 

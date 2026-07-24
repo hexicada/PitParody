@@ -1316,29 +1316,34 @@ shape = SubResource("Shape_unit")
 [node name="KnightA" parent="Necropolis/CommentKnights" instance=ExtResource("1_knight")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38, -63.8, -6)
 display_name = "Ravenous Verified"
+kaykit_variant = "knight"
 patrol_half_extent = 6.0
 
 [node name="KnightB" parent="Necropolis/CommentKnights" instance=ExtResource("1_knight")]
 transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 58, -63.8, 6)
 display_name = "Ratio Thrall-Knight"
+kaykit_variant = "rogue"
 patrol_half_extent = 7.0
 max_health = 100.0
 
 [node name="KnightC" parent="Necropolis/CommentKnights" instance=ExtResource("1_knight")]
 transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 75, -63.8, -4)
 display_name = "Quote Cleaver"
+kaykit_variant = "barbarian"
 patrol_half_extent = 5.5
 chase_speed = 5.6
 
 [node name="KnightD" parent="Necropolis/CommentKnights" instance=ExtResource("1_knight")]
 transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 50, -63.8, 18)
 display_name = "Hot Take Acolyte-Knight"
+kaykit_variant = "rogue"
 patrol_half_extent = 6.5
 sword_damage = 65.0
 
 [node name="KnightE" parent="Necropolis/CommentKnights" instance=ExtResource("1_knight")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 90, -63.8, 8)
 display_name = "Engagement Wizard-Knight"
+kaykit_variant = "knight"
 patrol_half_extent = 4.5
 max_health = 110.0
 aggro_range = 26.0

@@ -1,23 +1,17 @@
 # Player character meshes
 
-## `guardian_body.glb` (active)
+## Active player body
 
-**CesiumMan** humanoid (Khronos sample, Apache 2.0) — temporary game-ready body.
+**KayKit Knight** — `res/assets/characters/kaykit/characters/Knight.glb` (CC0)
 
 | | |
 |--|--|
 | Wired as | `Player/WorldBodyRoot/GuardianBody` |
-| Facing | 180° Y in `player.tscn` so front faces player forward (−Z) |
-| Credits | `THIRD_PARTY_CREDITS.md` |
+| Facing | 180° Y so front matches player −Z |
+| Credits | `res/assets/characters/kaykit/CREDITS.txt` |
 
-### Swap in better art (recommended)
+Legacy `guardian_body.glb` (CesiumMan) may remain as fallback; not used by player.tscn.
 
-[KayKit Adventurers](https://kaylousberg.itch.io/kaykit-adventurers) (CC0, free):
+### Weapons
 
-1. Download Free pack → Knight GLB  
-2. Overwrite `guardian_body.glb`  
-3. Reimport in Godot; adjust scale if needed  
-
-### Not used in-game
-
-Procedural Blender scripts under `tools/blender/` — experiments only.
+Loadout catalog: `res/actors/player/weapons/` — keys **1–5**, mouse wheel, Tab.

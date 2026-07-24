@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://bm8gvtr78jhld"
-path="res://.godot/imported/pit_entrance_reference.jpg-a97cb257792bdc4028d6eb21f68c5a81.ctex"
+path="res://.godot/imported/pit_entrance_reference.jpg-ba4fba4ea0ce6cd12af264628371c960.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://pit_entrance_reference.jpg"
-dest_files=["res://.godot/imported/pit_entrance_reference.jpg-a97cb257792bdc4028d6eb21f68c5a81.ctex"]
+source_file="res://docs/ref/pit_entrance_reference.jpg"
+dest_files=["res://.godot/imported/pit_entrance_reference.jpg-ba4fba4ea0ce6cd12af264628371c960.ctex"]
 
 [params]
 

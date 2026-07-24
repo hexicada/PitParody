@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b31mrbcx3ri0g"
-path="res://.godot/imported/cursed_thrall_reference.jpg-2b9f3f8f55713e2de0167ad3b8b1dbe5.ctex"
+uid="uid://n8y8wh6am464"
+path="res://.godot/imported/knight_texture.png-cbe941fffab292844ca1eb18eff6e9dc.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://docs/ref/cursed_thrall_reference.jpg"
-dest_files=["res://.godot/imported/cursed_thrall_reference.jpg-2b9f3f8f55713e2de0167ad3b8b1dbe5.ctex"]
+source_file="res://res/assets/characters/kaykit/weapons/knight_texture.png"
+dest_files=["res://.godot/imported/knight_texture.png-cbe941fffab292844ca1eb18eff6e9dc.ctex"]
 
 [params]
 

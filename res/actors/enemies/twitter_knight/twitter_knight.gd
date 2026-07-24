@@ -2,9 +2,23 @@ extends CharacterBody3D
 class_name TwitterCommentKnight
 
 ## Melee knight that quotes X discourse while swinging a sword.
+## Visuals: KayKit Adventurers (CC0) with a hive-green material tint.
 ## Sword hits only reach ground-level targets — jump boxes get you out of range.
 
 const _DamageNumber := preload("res://res/actors/fx/damage_number.gd")
+
+const KAYKIT_PATHS := {
+	"knight": "res://res/assets/characters/kaykit/characters/Knight.glb",
+	"rogue": "res://res/assets/characters/kaykit/characters/Rogue.glb",
+	"barbarian": "res://res/assets/characters/kaykit/characters/Barbarian.glb",
+}
+
+## Hive-ish green used to retint KayKit albedo / emission.
+const HIVE_ALBEDO := Color(0.42, 0.72, 0.38, 1.0)
+const HIVE_EMISSION := Color(0.18, 0.85, 0.22, 1.0)
+const HIVE_TINT_BLEND := 0.42
+const HIVE_EMISSION_IDLE := 0.22
+const HIVE_EMISSION_FLASH := 2.4
 
 ## Parody taunts inspired by public Destiny / live-service discourse on X.
 const DEFAULT_QUOTES: PackedStringArray = [
@@ -45,6 +59,15 @@ const DEFAULT_QUOTES: PackedStringArray = [
 @export var taunt_interval_max: float = 5.5
 @export var quotes: PackedStringArray = DEFAULT_QUOTES
 
+## Which KayKit Adventurers mesh to instance: knight / rogue / barbarian.
+@export_enum("knight", "rogue", "barbarian") var kaykit_variant: String = "knight"
+## Optional full override — if set, used instead of kaykit_variant.
+@export var kaykit_scene_override: PackedScene
+## Extra Y rotation on the visual only. CharacterBody +Z faces chase dir (atan2).
+## KayKit faces +Z in glTF → 0 matches chase. Flip to 180 if they moonwalk.
+@export var model_yaw_offset_degrees: float = 0.0
+@export var model_scale: float = 1.0
+
 var health: float
 var _home: Vector3
 var _patrol_dir: float = 1.0
@@ -54,8 +77,11 @@ var _dead: bool = false
 var _flash_left: float = 0.0
 var _taunt_cd: float = 1.0
 var _attacking: bool = false
+## Materials we own (duplicated + hive-tinted) for hit flash.
+var _owned_mats: Array[StandardMaterial3D] = []
 
 @onready var _mesh_root: Node3D = $Body
+@onready var _kaykit_mount: Node3D = $Body/KaykitMount
 @onready var _sword: Node3D = $Body/SwordPivot
 @onready var _name_label: Label3D = $NameLabel
 @onready var _quote_label: Label3D = $QuoteBubble
@@ -68,7 +94,8 @@ func _ready() -> void:
 	add_to_group("enemy")
 	add_to_group("damageable")
 	add_to_group("twitter_knight")
-	_dup_mats($Body)
+	_setup_kaykit_visual()
+	_apply_hive_look($Body)
 	if _name_label:
 		_name_label.text = display_name
 	if _quote_label:
@@ -78,13 +105,93 @@ func _ready() -> void:
 	_say_quote(true)
 
 
-func _dup_mats(node: Node) -> void:
+func _setup_kaykit_visual() -> void:
+	if _kaykit_mount == null:
+		return
+
+	# Drop editor preview / previous instance children.
+	for child in _kaykit_mount.get_children():
+		_kaykit_mount.remove_child(child)
+		child.free()
+
+	var scene: PackedScene = kaykit_scene_override
+	if scene == null:
+		var key := kaykit_variant.to_lower()
+		var path: String = KAYKIT_PATHS.get(key, KAYKIT_PATHS["knight"])
+		if ResourceLoader.exists(path):
+			scene = load(path) as PackedScene
+		else:
+			push_warning("TwitterCommentKnight: missing KayKit asset at %s" % path)
+
+	if scene == null:
+		return
+
+	var inst := scene.instantiate()
+	if inst is Node3D:
+		var n3 := inst as Node3D
+		_kaykit_mount.add_child(n3)
+		n3.position = Vector3.ZERO
+		n3.rotation = Vector3.ZERO
+		n3.scale = Vector3.ONE
+	else:
+		_kaykit_mount.add_child(inst)
+
+	_kaykit_mount.rotation_degrees = Vector3(0.0, model_yaw_offset_degrees, 0.0)
+	_kaykit_mount.scale = Vector3.ONE * model_scale
+
+
+func _apply_hive_look(node: Node) -> void:
 	if node is MeshInstance3D:
-		var mi := node as MeshInstance3D
-		if mi.material_override:
-			mi.material_override = mi.material_override.duplicate()
+		_tint_mesh_instance(node as MeshInstance3D)
 	for child in node.get_children():
-		_dup_mats(child)
+		_apply_hive_look(child)
+
+
+func _tint_mesh_instance(mi: MeshInstance3D) -> void:
+	if mi.material_override is StandardMaterial3D:
+		var base := (mi.material_override as StandardMaterial3D).duplicate() as StandardMaterial3D
+		_hive_tint_material(base)
+		mi.material_override = base
+		_owned_mats.append(base)
+		return
+
+	var surface_count := 0
+	if mi.mesh:
+		surface_count = mi.mesh.get_surface_count()
+	if surface_count <= 0:
+		surface_count = mi.get_surface_override_material_count()
+
+	for i in surface_count:
+		var src: Material = mi.get_active_material(i)
+		if src == null:
+			continue
+		if src is StandardMaterial3D:
+			var mat := (src as StandardMaterial3D).duplicate() as StandardMaterial3D
+			_hive_tint_material(mat)
+			mi.set_surface_override_material(i, mat)
+			_owned_mats.append(mat)
+		elif src is BaseMaterial3D:
+			# ORM / other BaseMaterial3D — still push a green Standard overlay feel.
+			var mat2 := StandardMaterial3D.new()
+			mat2.albedo_color = HIVE_ALBEDO
+			mat2.emission_enabled = true
+			mat2.emission = HIVE_EMISSION
+			mat2.emission_energy_multiplier = HIVE_EMISSION_IDLE
+			mat2.roughness = 0.7
+			mi.set_surface_override_material(i, mat2)
+			_owned_mats.append(mat2)
+
+
+func _hive_tint_material(mat: StandardMaterial3D) -> void:
+	mat.albedo_color = mat.albedo_color.lerp(HIVE_ALBEDO, HIVE_TINT_BLEND)
+	mat.emission_enabled = true
+	var em := mat.emission
+	if em.r + em.g + em.b < 0.05:
+		em = HIVE_EMISSION
+	else:
+		em = em.lerp(HIVE_EMISSION, 0.55)
+	mat.emission = em
+	mat.emission_energy_multiplier = maxf(mat.emission_energy_multiplier, HIVE_EMISSION_IDLE)
 
 
 func _physics_process(delta: float) -> void:
@@ -236,6 +343,7 @@ func _patrol(delta: float) -> void:
 func _face_direction(dir: Vector3) -> void:
 	if dir.length_squared() < 0.0001:
 		return
+	# Makes CharacterBody local +Z face `dir` (KayKit face is +Z → no model offset needed).
 	var yaw := atan2(dir.x, dir.z)
 	rotation.y = lerp_angle(rotation.y, yaw, 0.22)
 
@@ -286,17 +394,14 @@ func _hurt_player(target: Node) -> bool:
 
 func _apply_flash() -> void:
 	var hot := _flash_left > 0.0
-	_flash_node($Body, hot)
-
-
-func _flash_node(node: Node, hot: bool) -> void:
-	if node is MeshInstance3D:
-		var mi := node as MeshInstance3D
-		if mi.material_override is StandardMaterial3D:
-			var mat := mi.material_override as StandardMaterial3D
-			mat.emission_energy_multiplier = 2.2 if hot else (0.25 if mi == _sword_mat_host else 0.15)
-	for child in node.get_children():
-		_flash_node(child, hot)
+	var energy := HIVE_EMISSION_FLASH if hot else HIVE_EMISSION_IDLE
+	for mat in _owned_mats:
+		if mat:
+			mat.emission_energy_multiplier = energy
+	# Fallback sword host material if it wasn't collected (hidden procedural blade).
+	if _sword_mat_host and _sword_mat_host.material_override is StandardMaterial3D:
+		var sm := _sword_mat_host.material_override as StandardMaterial3D
+		sm.emission_energy_multiplier = (HIVE_EMISSION_FLASH if hot else 0.45)
 
 
 func _die() -> void:
